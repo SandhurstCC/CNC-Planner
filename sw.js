@@ -1,4 +1,4 @@
-const CACHE = 'cnc-planner-v1';
+const CACHE = 'cnc-planner-v3';
 const ASSETS = [
   '/CNC-Planner/CNC_Planner.html',
   '/CNC-Planner/manifest.json'
@@ -21,15 +21,13 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // Network-first strategy: always try network, fall back to cache
   e.respondWith(
-    caches.match(e.request).then(cached => {
-      if (cached) return cached;
-      return fetch(e.request).then(response => {
-        if (!response || response.status !== 200 || response.type !== 'basic') return response;
-        const clone = response.clone();
-        caches.open(CACHE).then(cache => cache.put(e.request, clone));
-        return response;
-      }).catch(() => caches.match('/CNC-Planner/CNC_Planner.html'));
-    })
+    fetch(e.request).then(response => {
+      if (!response || response.status !== 200 || response.type !== 'basic') return response;
+      const clone = response.clone();
+      caches.open(CACHE).then(cache => cache.put(e.request, clone));
+      return response;
+    }).catch(() => caches.match(e.request))
   );
 });
