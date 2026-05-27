@@ -4,6 +4,10 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>CNC Machine Planner — Felder &amp; AXYZ</title>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#f4f3f0"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="CNC Planner"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,sans-serif;background:#f4f3f0;color:#111;min-height:100vh}
@@ -707,6 +711,13 @@ function restoreData(event){
 // ── Boot ──────────────────────────────────────────────────────────────────
 loadState();
 render();
+
+// ── PWA service worker registration ───────────────────────────────────────
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
 </script>
 </body>
 </html>
