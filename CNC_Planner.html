@@ -11,109 +11,148 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,sans-serif;background:#f4f3f0;color:#111;min-height:100vh}
-.shell{max-width:1200px;margin:0 auto;padding:1.25rem 1rem 3rem}
-h1.pt{font-size:18px;font-weight:600;display:flex;align-items:center;gap:8px;margin-bottom:1rem}
-.top-bar{display:flex;align-items:center;gap:7px;margin-bottom:1rem;flex-wrap:wrap}
-.top-bar-title{font-size:14px;font-weight:500;flex:1}
-.date-nav{display:flex;align-items:center;gap:5px}
-.date-nav button,.ibtn{background:#fff;border:1px solid #d0cfc9;border-radius:7px;padding:4px 9px;cursor:pointer;color:#111;font-size:12px;line-height:1.4;display:inline-flex;align-items:center;gap:4px}
-.date-nav button:hover,.ibtn:hover{background:#ece9e3}
-.dlabel{font-size:12px;font-weight:500;min-width:180px;text-align:center;background:#fff;border:1px solid #d0cfc9;border-radius:7px;padding:4px 10px}
-.sbar{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:1rem}
-.stat{background:#fff;border-radius:9px;padding:.6rem .85rem;border:1px solid #e0ded8}
-.slabel{font-size:10px;color:#777;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
-.sval{font-size:17px;font-weight:600;color:#111}
+.shell{max-width:1300px;margin:0 auto;padding:1rem 1rem 3rem}
+/* top bar */
+.topbar{display:flex;align-items:center;gap:7px;margin-bottom:.9rem;flex-wrap:wrap}
+.topbar-title{font-size:15px;font-weight:600;flex:1}
+.dnav{display:flex;align-items:center;gap:5px}
+.dnav button,.ibtn{background:#fff;border:1px solid #d0cfc9;border-radius:7px;padding:4px 9px;cursor:pointer;color:#111;font-size:12px;line-height:1.4;display:inline-flex;align-items:center;gap:4px}
+.dnav button:hover,.ibtn:hover{background:#ece9e3}
+.dlabel{font-size:12px;font-weight:500;min-width:170px;text-align:center;background:#fff;border:1px solid #d0cfc9;border-radius:7px;padding:4px 10px}
+/* view tabs */
+.vtabs{display:flex;gap:0;margin-bottom:1rem;border-bottom:1.5px solid #d0cfc9}
+.vtab{padding:6px 20px;font-size:13px;font-weight:500;cursor:pointer;color:#888;border:none;background:none;border-bottom:2.5px solid transparent;margin-bottom:-1.5px}
+.vtab.active{color:#111;border-bottom-color:#111}
+.vtab:hover{color:#111}
+/* stats */
+.sbar{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:.9rem}
+.stat{background:#fff;border-radius:9px;padding:.55rem .8rem;border:1px solid #e0ded8}
+.slbl{font-size:10px;color:#777;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.sval{font-size:16px;font-weight:600;color:#111}
 .sval.ok{color:#1a8a62}.sval.warn{color:#a06010}.sval.bad{color:#a02020}
-.banner{border-radius:8px;padding:6px 10px;font-size:12px;margin-bottom:8px;display:none;align-items:flex-start;gap:6px}
+/* banner */
+.banner{border-radius:8px;padding:5px 10px;font-size:11px;margin-bottom:7px;display:none;align-items:flex-start;gap:5px}
 .banner.show{display:flex}
 .banner.warn{background:#fdf3e3;border:1px solid #f0c060;color:#7a4a00}
-.cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:1rem}
-.card{background:#fff;border:1px solid #dddbd5;border-radius:12px;overflow:hidden}
-.ch{display:flex;align-items:center;justify-content:space-between;padding:.55rem .9rem;border-bottom:1px solid #e8e6e0}
+/* daily view - 3 col */
+.dcols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:1rem}
+/* weekly view - machine tabs */
+.wtabs{display:flex;gap:5px;margin-bottom:.8rem}
+.wtab{padding:4px 14px;font-size:12px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;color:#777}
+.wtab.active{background:#111;color:#fff;border-color:#111}
+.wpanel{display:none}
+.wpanel.active{display:block}
+.wdays{display:flex;flex-direction:column;gap:10px}
+.wday{background:#fff;border:1px solid #dddbd5;border-radius:10px;overflow:hidden}
+.wday-hdr{display:flex;align-items:center;justify-content:space-between;padding:.5rem .9rem;background:#faf9f6;border-bottom:1px solid #e8e6e0;cursor:pointer}
+.wday-hdr:hover{background:#f0ede8}
+.wday-name{font-size:13px;font-weight:600}
+.wday-util{font-size:11px;color:#777}
+.wday-body{padding:.65rem .9rem}
+/* monthly view */
+.mcal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.mcal-hdr{text-align:center;font-size:11px;font-weight:600;color:#888;padding:4px 0;text-transform:uppercase}
+.mday{background:#fff;border:1px solid #e0ded8;border-radius:7px;padding:6px 7px;min-height:80px;cursor:pointer;transition:border-color .1s}
+.mday:hover{border-color:#999}
+.mday.empty{background:#f8f7f4;cursor:default;border-color:#eee}
+.mday.today{border-color:#378ADD;border-width:2px}
+.mday.selected{border-color:#111;border-width:2px}
+.mday-num{font-size:12px;font-weight:600;color:#555;margin-bottom:4px}
+.mday-num.weekend{color:#bbb}
+.mday-util-bar{height:5px;border-radius:3px;margin-bottom:3px;background:#eee}
+.mday-util-fill{height:100%;border-radius:3px;background:#1a8a62;transition:width .2s}
+.mday-util-fill.warn{background:#a06010}
+.mday-util-fill.bad{background:#a02020}
+.mday-jobs{font-size:10px;color:#888;line-height:1.5}
+.mday-lead{font-size:9px;font-weight:600;margin-top:3px;padding:1px 4px;border-radius:3px;display:inline-block}
+.mday-lead.green{background:#d8f3ea;color:#0a6644}
+.mday-lead.amber{background:#faeeda;color:#7a4a00}
+.mday-lead.red{background:#fdeaea;color:#7a0000}
+/* card */
+.card{background:#fff;border:1px solid #dddbd5;border-radius:10px;overflow:hidden}
+.ch{display:flex;align-items:center;justify-content:space-between;padding:.5rem .85rem;border-bottom:1px solid #e8e6e0}
 .ch.f{background:#e8f7f1}.ch.a{background:#e8eef7}.ch.o{background:#f7f0e8}
-.cname{font-size:13px;font-weight:600;display:flex;align-items:center;gap:5px}
+.cname{font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px}
 .cutil{font-size:11px;color:#777}
-.jbadge{font-size:10px;background:#d8f3ea;color:#0a6644;border-radius:4px;padding:1px 6px;font-weight:500}
-.tw{padding:.65rem .9rem}
-.tls{font-size:10px;color:#888;margin-bottom:4px}
-.tl{position:relative;height:28px;background:#ede9e3;border-radius:6px;margin-bottom:4px;overflow:visible}
-.tlbg{position:absolute;inset:0;border-radius:6px;overflow:hidden}
+.jbadge{font-size:9px;background:#d8f3ea;color:#0a6644;border-radius:4px;padding:1px 5px;font-weight:500}
+.tw{padding:.6rem .85rem}
+.tls{font-size:10px;color:#888;margin-bottom:3px}
+.tl{position:relative;height:26px;background:#ede9e3;border-radius:5px;margin-bottom:3px;overflow:visible}
+.tlbg{position:absolute;inset:0;border-radius:5px;overflow:hidden}
 .tlbr{position:absolute;top:0;bottom:0;background:rgba(100,95,85,.18)}
-.tlsg{position:absolute;top:2px;bottom:2px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;overflow:hidden;white-space:nowrap;padding:0 2px;color:#fff}
+.tlsg{position:absolute;top:2px;bottom:2px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:600;overflow:hidden;white-space:nowrap;padding:0 2px;color:#fff}
 .tlsg:hover{opacity:.8;z-index:5}
-.tkrow{position:relative;height:12px;margin-bottom:6px}
+.tkrow{position:relative;height:11px;margin-bottom:5px}
 .tk{position:absolute;font-size:9px;color:#aaa;transform:translateX(-50%)}
-.bleg{display:flex;align-items:center;gap:5px;margin-bottom:6px}
-.bsw{width:9px;height:9px;border-radius:2px;background:rgba(100,95,85,.28);flex-shrink:0}
-.blt{font-size:10px;color:#888}
-.jlist{min-height:28px}
-.ji{display:flex;align-items:flex-start;gap:6px;padding:5px 0;border-bottom:1px solid #f0eee8;user-select:none}
+.bleg{display:flex;align-items:center;gap:4px;margin-bottom:5px}
+.bsw{width:8px;height:8px;border-radius:2px;background:rgba(100,95,85,.28);flex-shrink:0}
+.blt{font-size:9px;color:#999}
+/* job list */
+.jlist{min-height:24px}
+.ji{display:flex;align-items:flex-start;gap:5px;padding:4px 0;border-bottom:1px solid #f0eee8;user-select:none}
 .ji:last-child{border-bottom:none}
 .ji.dragging{opacity:.35}
 .ji.drag-over{background:#f5f3ee;border-radius:4px}
-.grip{cursor:grab;color:#ccc;font-size:15px;padding-top:2px;flex-shrink:0;line-height:1}
+.grip{cursor:grab;color:#ccc;font-size:14px;padding-top:2px;flex-shrink:0;line-height:1}
 .grip:active{cursor:grabbing}
-.jdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.jdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px}
 .ji-info{flex:1;min-width:0}
-.jn{font-size:12px;font-weight:600;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
-.bdg{font-size:10px;border-radius:4px;padding:1px 5px;font-weight:500}
+.jn{font-size:11px;font-weight:600;display:flex;align-items:center;gap:3px;flex-wrap:wrap}
+.bdg{font-size:9px;border-radius:3px;padding:1px 4px;font-weight:500}
 .bdg.sp{background:#daeaf8;color:#1a4f80}
 .bdg.jb{background:#d8f3ea;color:#0a6644}
 .bdg.eb{background:#f3e8d8;color:#6a3a00}
 .bdg.lb{background:#ede8f7;color:#3a1a6a}
-.jmeta{font-size:11px;color:#777;margin-top:1px;line-height:1.5}
-.jtime{font-size:11px;color:#555;margin-top:1px;line-height:1.5}
-.jwarn{font-size:11px;color:#993020;margin-top:1px}
-.erow{display:flex;align-items:center;gap:5px;margin-top:5px;flex-wrap:wrap;background:#f8f7f4;border-radius:6px;padding:6px 7px}
+.bdg.co{background:#faeeda;color:#7a4a00}
+.jmeta{font-size:10px;color:#777;margin-top:1px;line-height:1.4}
+.jtime{font-size:10px;color:#555;margin-top:1px;line-height:1.4}
+.jwarn{font-size:10px;color:#993020;margin-top:1px}
+.erow{display:flex;align-items:center;gap:4px;margin-top:4px;flex-wrap:wrap;background:#f8f7f4;border-radius:5px;padding:5px 6px}
 .erow label{font-size:10px;color:#888}
-.erow input{height:26px;width:52px;padding:0 5px;font-size:12px;border:1px solid #ccc;border-radius:5px;background:#fff;color:#111}
-.erow .sb{height:26px;padding:0 9px;font-size:12px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;color:#111}
+.erow input{height:24px;width:50px;padding:0 4px;font-size:11px;border:1px solid #ccc;border-radius:4px;background:#fff;color:#111}
+.erow .sb{height:24px;padding:0 8px;font-size:11px;border:1px solid #ccc;border-radius:4px;background:#fff;cursor:pointer;color:#111}
 .jacts{display:flex;gap:1px;flex-shrink:0;padding-top:1px}
-.jacts button{background:none;border:none;cursor:pointer;color:#bbb;font-size:13px;padding:2px 4px;border-radius:4px;line-height:1}
+.jacts button{background:none;border:none;cursor:pointer;color:#bbb;font-size:12px;padding:1px 3px;border-radius:3px;line-height:1}
 .jacts button:hover{color:#111;background:#f0eee8}
-.nojobs{font-size:12px;color:#bbb;padding:6px 0}
-.cosec{background:#fff;border:1px solid #dddbd5;border-radius:12px;padding:.75rem .9rem;margin-bottom:1rem}
-.cosec h3{font-size:13px;font-weight:600;margin-bottom:.5rem;color:#111}
-.colist{display:flex;flex-direction:column;gap:4px}
-.coi{display:flex;align-items:center;gap:7px;font-size:12px;padding:5px 8px;background:#faf9f6;border-radius:7px;border:1px solid #ece9e3}
-.coi-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.coi-info{flex:1;color:#444;line-height:1.5}
-.coi button{font-size:12px;border:1px solid #ccc;border-radius:5px;padding:2px 8px;background:#fff;cursor:pointer;color:#111}
-.coi button:hover{background:#ece9e3}
-.addsec{background:#fff;border:1px solid #dddbd5;border-radius:12px;padding:.8rem .9rem}
-.addsec h3{font-size:13px;font-weight:600;margin-bottom:.55rem;color:#111}
-.tabrow{display:flex;gap:5px;margin-bottom:.65rem}
-.tabb{padding:3px 12px;font-size:12px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;color:#777}
+.nojobs{font-size:11px;color:#bbb;padding:5px 0}
+/* carry-over */
+.cosec{background:#fff;border:1px solid #dddbd5;border-radius:10px;padding:.7rem .85rem;margin-bottom:.9rem}
+.cosec h3{font-size:12px;font-weight:600;margin-bottom:.45rem;color:#111}
+.colist{display:flex;flex-direction:column;gap:3px}
+.coi{display:flex;align-items:center;gap:6px;font-size:11px;padding:4px 7px;background:#faf9f6;border-radius:6px;border:1px solid #ece9e3}
+.coi-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.coi-info{flex:1;color:#444;line-height:1.4}
+.coi button{font-size:11px;border:1px solid #ccc;border-radius:4px;padding:1px 7px;background:#fff;cursor:pointer;color:#111}
+/* add form */
+.addsec{background:#fff;border:1px solid #dddbd5;border-radius:10px;padding:.75rem .85rem}
+.addsec h3{font-size:12px;font-weight:600;margin-bottom:.5rem;color:#111}
+.tabrow{display:flex;gap:4px;margin-bottom:.6rem}
+.tabb{padding:3px 11px;font-size:11px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;color:#777}
 .tabb.active{background:#111;color:#fff;border-color:#111}
 .fpanel{display:none}
 .fpanel.active{display:block}
-.fgrid{display:grid;gap:7px;align-items:end}
-.fg{display:flex;flex-direction:column;gap:3px}
+.fgrid{display:grid;gap:6px;align-items:end}
+.fg{display:flex;flex-direction:column;gap:2px}
 .fg label{font-size:10px;color:#888;font-weight:500}
-.fg input,.fg select{height:31px;padding:0 7px;font-size:12px;border:1px solid #ccc;border-radius:6px;background:#fff;color:#111;width:100%}
+.fg input,.fg select{height:30px;padding:0 7px;font-size:12px;border:1px solid #ccc;border-radius:5px;background:#fff;color:#111;width:100%}
 .fg input:focus,.fg select:focus{outline:2px solid #378ADD;outline-offset:1px}
 .fnote{font-size:10px;color:#999;margin-top:3px}
-.badd{height:31px;padding:0 13px;background:#111;border:1px solid #111;border-radius:6px;cursor:pointer;font-size:12px;color:#fff;white-space:nowrap}
+.badd{height:30px;padding:0 12px;background:#111;border:1px solid #111;border-radius:5px;cursor:pointer;font-size:12px;color:#fff;white-space:nowrap}
 .badd:hover{background:#333}
-.err{font-size:12px;color:#a02020;margin-top:4px;min-height:14px}
+.err{font-size:11px;color:#a02020;margin-top:4px;min-height:13px}
 @media print{
   body{background:#fff}.shell{padding:.5rem}
-  .date-nav,.ibtn,.addsec,.cosec .coi button,.jacts,.bleg,.banner{display:none!important}
+  .dnav,.ibtn,.vtabs,.addsec,.cosec .coi button,.jacts,.bleg,.banner,.wtabs{display:none!important}
   .card{break-inside:avoid;border:1px solid #ccc}
-  .cols,.sbar{gap:6px}
+  .dcols,.sbar{gap:5px}
 }
 </style>
 </head>
 <body>
 <div class="shell">
-<h1 class="pt">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:20px;height:20px;flex-shrink:0"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-  CNC Machine Planner
-</h1>
-
-<div class="top-bar">
-  <div class="top-bar-title">Felder &amp; AXYZ — operator scheduling</div>
-  <div class="date-nav">
+<div class="topbar">
+  <div class="topbar-title">&#9632; CNC Machine Planner</div>
+  <div class="dnav">
     <button onclick="chDay(-1)">&#8249;</button>
     <span class="dlabel" id="dlabel"></span>
     <button onclick="chDay(1)">&#8250;</button>
@@ -126,159 +165,166 @@ h1.pt{font-size:18px;font-weight:600;display:flex;align-items:center;gap:8px;mar
   <button class="ibtn" onclick="clearDay()" style="color:#a02020;border-color:#e0a0a0">&#10005; Clear day</button>
 </div>
 
-<div class="sbar">
-  <div class="stat"><div class="slabel">Shift length</div><div class="sval" id="s-shift">—</div></div>
-  <div class="stat"><div class="slabel">Felder utilisation</div><div class="sval" id="s-u0">—</div></div>
-  <div class="stat"><div class="slabel">AXYZ utilisation</div><div class="sval" id="s-u1">—</div></div>
-  <div class="stat"><div class="slabel">Operator utilisation</div><div class="sval" id="s-uop">—</div></div>
-  <div class="stat"><div class="slabel">Jobs today</div><div class="sval" id="s-jobs">0</div></div>
+<div class="vtabs">
+  <button class="vtab active" onclick="setView('daily')">Daily</button>
+  <button class="vtab" onclick="setView('weekly')">Weekly</button>
+  <button class="vtab" onclick="setView('monthly')">Monthly</button>
 </div>
 
-<div class="banner warn" id="ov-banner"><span style="flex-shrink:0">&#9888;</span><span id="ov-text"></span></div>
-
-<div class="cols">
-  <div class="card">
-    <div class="ch f"><span class="cname">&#9632; Felder <span class="jbadge">Jumbo sheet</span></span><span class="cutil" id="cu-0">—</span></div>
-    <div class="tw">
-      <div class="tls" id="tls-0"></div>
-      <div class="tl" id="tl-0"><div class="tlbg" id="bg-0"></div></div>
-      <div class="tkrow" id="tk-0"></div>
-      <div class="bleg"><div class="bsw"></div><span class="blt">Break — machine runs, no load/unload</span></div>
-      <div class="jlist" id="jl-0"></div>
+<!-- DAILY VIEW -->
+<div id="view-daily">
+  <div class="sbar">
+    <div class="stat"><div class="slbl">Shift length</div><div class="sval" id="s-shift">—</div></div>
+    <div class="stat"><div class="slbl">Felder utilisation</div><div class="sval" id="s-u0">—</div></div>
+    <div class="stat"><div class="slbl">AXYZ utilisation</div><div class="sval" id="s-u1">—</div></div>
+    <div class="stat"><div class="slbl">Operator utilisation</div><div class="sval" id="s-uop">—</div></div>
+    <div class="stat"><div class="slbl">Jobs today</div><div class="sval" id="s-jobs">0</div></div>
+  </div>
+  <div class="banner warn" id="ov-banner"><span>&#9888;</span><span id="ov-text"></span></div>
+  <div class="dcols">
+    <div class="card">
+      <div class="ch f"><span class="cname">&#9632; Felder <span class="jbadge">Jumbo</span></span><span class="cutil" id="cu-0">—</span></div>
+      <div class="tw">
+        <div class="tls" id="tls-0"></div>
+        <div class="tl" id="tl-0"><div class="tlbg" id="bg-0"></div></div>
+        <div class="tkrow" id="tk-0"></div>
+        <div class="bleg"><div class="bsw"></div><span class="blt">Break — machine runs, no load/unload</span></div>
+        <div class="jlist" id="jl-0"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch a"><span class="cname">&#9632; AXYZ</span><span class="cutil" id="cu-1">—</span></div>
+      <div class="tw">
+        <div class="tls" id="tls-1"></div>
+        <div class="tl" id="tl-1"><div class="tlbg" id="bg-1"></div></div>
+        <div class="tkrow" id="tk-1"></div>
+        <div class="bleg"><div class="bsw"></div><span class="blt">Break — machine runs, no load/unload</span></div>
+        <div class="jlist" id="jl-1"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch o"><span class="cname">&#9632; Operator</span><span class="cutil" id="cu-op">—</span></div>
+      <div class="tw">
+        <div class="tls" id="tls-op"></div>
+        <div class="tl" id="tl-op"><div class="tlbg" id="bg-op"></div></div>
+        <div class="tkrow" id="tk-op"></div>
+        <div class="bleg"><div class="bsw"></div><span class="blt">Break — no operator tasks</span></div>
+        <div class="jlist" id="jl-op"></div>
+      </div>
     </div>
   </div>
-  <div class="card">
-    <div class="ch a"><span class="cname">&#9632; AXYZ</span><span class="cutil" id="cu-1">—</span></div>
-    <div class="tw">
-      <div class="tls" id="tls-1"></div>
-      <div class="tl" id="tl-1"><div class="tlbg" id="bg-1"></div></div>
-      <div class="tkrow" id="tk-1"></div>
-      <div class="bleg"><div class="bsw"></div><span class="blt">Break — machine runs, no load/unload</span></div>
-      <div class="jlist" id="jl-1"></div>
-    </div>
+  <div class="cosec" id="cosec" style="display:none">
+    <h3>&#8658; Queued for future days</h3>
+    <div class="colist" id="colist"></div>
   </div>
-  <div class="card">
-    <div class="ch o"><span class="cname">&#9632; Operator</span><span class="cutil" id="cu-op">—</span></div>
-    <div class="tw">
-      <div class="tls" id="tls-op"></div>
-      <div class="tl" id="tl-op"><div class="tlbg" id="bg-op"></div></div>
-      <div class="tkrow" id="tk-op"></div>
-      <div class="bleg"><div class="bsw"></div><span class="blt">Break — no operator tasks</span></div>
-      <div class="jlist" id="jl-op"></div>
+  <div class="addsec">
+    <h3>+ Add task</h3>
+    <div class="tabrow">
+      <button class="tabb active" onclick="swTab('cnc')">CNC job</button>
+      <button class="tabb" onclick="swTab('eb')">Edgebanding</button>
+      <button class="tabb" onclick="swTab('labour')">Labour</button>
     </div>
+    <div class="fpanel active" id="fp-cnc">
+      <div class="fgrid" style="grid-template-columns:1.5fr .6fr .5fr .5fr .5fr .5fr auto">
+        <div class="fg"><label>Job name / ID</label><input type="text" id="f-name" placeholder="e.g. Cabinet sides" maxlength="50"/></div>
+        <div class="fg"><label>Machine</label><select id="f-mach"><option value="0">Felder ★</option><option value="1">AXYZ</option></select></div>
+        <div class="fg"><label>Sheets</label><input type="number" id="f-sh" min="1" max="9999" placeholder="8"/></div>
+        <div class="fg"><label>Mins/sheet</label><input type="number" id="f-st" min="1" max="9999" placeholder="12"/></div>
+        <div class="fg"><label>Load/sheet</label><input type="number" id="f-ld" min="1" max="999" placeholder="5"/></div>
+        <div class="fg"><label>Unload/sheet</label><input type="number" id="f-ul" min="1" max="999" placeholder="5"/></div>
+        <button class="badd" onclick="addCNC()">+ Add</button>
+      </div>
+      <div class="fnote">★ Felder default. Jobs &gt;3hrs get 1hr gap before next job on same machine. Auto-splits to next day if needed.</div>
+    </div>
+    <div class="fpanel" id="fp-eb">
+      <div class="fgrid" style="grid-template-columns:1.5fr .9fr .9fr auto">
+        <div class="fg"><label>Job name (must match CNC job)</label><input type="text" id="f-eb-name" placeholder="e.g. Cabinet sides" maxlength="50"/></div>
+        <div class="fg"><label>Linked machine</label><select id="f-eb-mach"><option value="0">Felder</option><option value="1">AXYZ</option></select></div>
+        <div class="fg"><label>Duration (mins)</label><input type="number" id="f-eb-dur" min="1" max="999" placeholder="30"/></div>
+        <button class="badd" onclick="addEB()">+ Add</button>
+      </div>
+      <div class="fnote">Starts after CNC job finishes. Pauses for load/unload. Runs concurrently with other CNC machine runs.</div>
+    </div>
+    <div class="fpanel" id="fp-labour">
+      <div class="fgrid" style="grid-template-columns:1.5fr .9fr .9fr auto">
+        <div class="fg"><label>Task description</label><input type="text" id="f-lab-name" placeholder="e.g. Assembly" maxlength="50"/></div>
+        <div class="fg"><label>Linked job (optional)</label><input type="text" id="f-lab-link" placeholder="Leave blank if standalone"/></div>
+        <div class="fg"><label>Duration (mins)</label><input type="number" id="f-lab-dur" min="1" max="999" placeholder="45"/></div>
+        <button class="badd" onclick="addLabour()">+ Add</button>
+      </div>
+      <div class="fnote">Fills operator gaps. If linked, starts after that CNC job finishes.</div>
+    </div>
+    <div class="err" id="errmsg"></div>
   </div>
 </div>
 
-<div class="cosec" id="cosec" style="display:none">
-  <h3>&#8658; Queued for future days</h3>
-  <div class="colist" id="colist"></div>
+<!-- WEEKLY VIEW -->
+<div id="view-weekly" style="display:none">
+  <div class="wtabs">
+    <button class="wtab active" onclick="swWTab('felder')">Felder</button>
+    <button class="wtab" onclick="swWTab('axyz')">AXYZ</button>
+    <button class="wtab" onclick="swWTab('operator')">Operator</button>
+  </div>
+  <div class="wpanel active" id="wp-felder"><div class="wdays" id="wd-felder"></div></div>
+  <div class="wpanel" id="wp-axyz"><div class="wdays" id="wd-axyz"></div></div>
+  <div class="wpanel" id="wp-operator"><div class="wdays" id="wd-operator"></div></div>
 </div>
 
-<div class="addsec">
-  <h3>+ Add task</h3>
-  <div class="tabrow">
-    <button class="tabb active" onclick="swTab('cnc')">CNC job</button>
-    <button class="tabb" onclick="swTab('eb')">Edgebanding</button>
-    <button class="tabb" onclick="swTab('labour')">Labour</button>
+<!-- MONTHLY VIEW -->
+<div id="view-monthly" style="display:none">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:.75rem">
+    <button class="ibtn" onclick="chMonth(-1)">&#8249; Prev</button>
+    <span style="font-size:14px;font-weight:600" id="month-label"></span>
+    <button class="ibtn" onclick="chMonth(1)">Next &#8250;</button>
   </div>
-  <div class="fpanel active" id="fp-cnc">
-    <div class="fgrid" style="grid-template-columns:1.5fr .65fr .55fr .55fr .55fr .55fr auto">
-      <div class="fg"><label>Job name / ID</label><input type="text" id="f-name" placeholder="e.g. Cabinet sides" maxlength="50"/></div>
-      <div class="fg"><label>Machine</label><select id="f-mach"><option value="0">Felder ★</option><option value="1">AXYZ</option></select></div>
-      <div class="fg"><label>Sheets</label><input type="number" id="f-sh" min="1" max="9999" placeholder="8"/></div>
-      <div class="fg"><label>Mins/sheet</label><input type="number" id="f-st" min="1" max="9999" placeholder="12"/></div>
-      <div class="fg"><label>Load/sheet</label><input type="number" id="f-ld" min="1" max="999" placeholder="5"/></div>
-      <div class="fg"><label>Unload/sheet</label><input type="number" id="f-ul" min="1" max="999" placeholder="5"/></div>
-      <button class="badd" onclick="addCNC()">+ Add</button>
-    </div>
-    <div class="fnote">★ Felder default. Operator loads &amp; unloads every sheet — machine runs unattended between. EB/labour can fill machine-run gaps.</div>
+  <div class="mcal" id="mcal"></div>
+  <div style="display:flex;gap:14px;margin-top:.75rem;font-size:11px;color:#777;align-items:center;flex-wrap:wrap">
+    <span>Lead time indicators:</span>
+    <span><span style="display:inline-block;width:10px;height:10px;background:#d8f3ea;border-radius:2px;margin-right:3px;vertical-align:middle"></span>Available (&lt;50% utilised)</span>
+    <span><span style="display:inline-block;width:10px;height:10px;background:#faeeda;border-radius:2px;margin-right:3px;vertical-align:middle"></span>Busy (50–85%)</span>
+    <span><span style="display:inline-block;width:10px;height:10px;background:#fdeaea;border-radius:2px;margin-right:3px;vertical-align:middle"></span>Full (&gt;85%)</span>
   </div>
-  <div class="fpanel" id="fp-eb">
-    <div class="fgrid" style="grid-template-columns:1.5fr .9fr .9fr auto">
-      <div class="fg"><label>Job name (must match CNC job)</label><input type="text" id="f-eb-name" placeholder="e.g. Cabinet sides" maxlength="50"/></div>
-      <div class="fg"><label>Linked machine</label><select id="f-eb-mach"><option value="0">Felder</option><option value="1">AXYZ</option></select></div>
-      <div class="fg"><label>Duration (mins)</label><input type="number" id="f-eb-dur" min="1" max="999" placeholder="30"/></div>
-      <button class="badd" onclick="addEB()">+ Add</button>
-    </div>
-    <div class="fnote">Edgebanding starts after CNC job finishes. Operator pauses to load/unload any CNC sheet. Can run concurrently with other CNC machine runs.</div>
-  </div>
-  <div class="fpanel" id="fp-labour">
-    <div class="fgrid" style="grid-template-columns:1.5fr .9fr .9fr auto">
-      <div class="fg"><label>Task description</label><input type="text" id="f-lab-name" placeholder="e.g. Assembly" maxlength="50"/></div>
-      <div class="fg"><label>Linked job (optional)</label><input type="text" id="f-lab-link" placeholder="Leave blank if standalone"/></div>
-      <div class="fg"><label>Duration (mins)</label><input type="number" id="f-lab-dur" min="1" max="999" placeholder="45"/></div>
-      <button class="badd" onclick="addLabour()">+ Add</button>
-    </div>
-    <div class="fnote">Labour fills operator gaps. If linked to a job, starts after that CNC job finishes. Pauses for CNC load/unload.</div>
-  </div>
-  <div class="err" id="errmsg"></div>
-</div>
 </div>
 
+</div><!-- /shell -->
 <script>
 const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DSHORT=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS_L=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MONTHS_S=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const SCH={1:{s:480,e:990},2:{s:480,e:990},3:{s:480,e:990},4:{s:480,e:990},5:{s:480,e:900}};
 const BRK=[{s:600,e:620},{s:780,e:810},{s:900,e:910}];
 const MN=['Felder','AXYZ'];
 const COLS=['#378ADD','#1D9E75','#BA7517','#D4537E','#7F77DD','#639922','#D85A30','#0F6E56','#854F0B','#185FA5','#3B6D11','#993C1D','#0a7090','#7a3080','#806010'];
 const EBC='#C07820';
 const LAC='#7050B0';
-const LSK='cnc_planner_v3';
+const LSK='cnc_planner_v4';
+const GAP_MINS=60;
+const LONG_JOB_MINS=180;
 
 let cur=new Date();
 let ST={};
 let cc=0;
 let DS={type:null,mIdx:null,fi:null};
+let curView='daily';
+let curWTab='felder';
+let monthRef=new Date();
 
 function save(){try{localStorage.setItem(LSK,JSON.stringify({ST,cc}))}catch(e){}}
 function load(){try{const r=localStorage.getItem(LSK);if(!r)return;const p=JSON.parse(r);if(p.ST)ST=p.ST;if(p.cc)cc=p.cc;}catch(e){}}
-
 function dk(d){return d.toISOString().slice(0,10)}
 function isWE(d){return d.getDay()===0||d.getDay()===6}
 function gs(d){return SCH[d.getDay()]||null}
 function ft(m){return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')}
 function fd(m){const h=Math.floor(m/60),mn=m%60;return h>0?(mn>0?h+'h '+mn+'m':h+'h'):mn+'m'}
-function eh(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-
+function eh(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function inBrk(m){for(const b of BRK)if(m>=b.s&&m<b.e)return b;return null}
+function nwd(d){let n=new Date(d);do{n.setDate(n.getDate()+1)}while(isWE(n)||!SCH[n.getDay()]);return n;}
+function initDay(k){if(!ST[k])ST[k]={cnc:[[],[]],eb:[],labour:[]};}
 
-function initDay(k){
-  if(!ST[k])ST[k]={cnc:[[],[]],eb:[],labour:[]};
-}
-
-// ── Per-sheet scheduling ───────────────────────────────────────────────────
-// Returns array of {loadStart,loadEnd,runStart,runEnd,unloadStart,unloadEnd}
-// opBusy = [{s,e}] sorted — blocks where operator is already committed
-function schedSheets(sheets,sheetTime,loadMins,unloadMins,startFrom,sched,opBusy){
-  const result=[];
-  let cursor=startFrom;
-  for(let i=0;i<sheets;i++){
-    // find op free slot for load
-    let ls=opNextFree(cursor,loadMins,sched,opBusy);
-    if(ls===null)return null;
-    const le=ls+loadMins;
-    // machine runs (no op needed)
-    const rs=le;
-    const re=rs+sheetTime;
-    if(re>sched.e)return null;
-    // find op free slot for unload (after machine finishes)
-    let us=opNextFree(re,unloadMins,sched,opBusy);
-    if(us===null||us+unloadMins>sched.e)return null;
-    const ue=us+unloadMins;
-    result.push({ls,le,rs,re,us,ue});
-    // Add these op blocks so next sheet respects them
-    opBusy.push({s:ls,e:le});
-    opBusy.push({s:us,e:ue});
-    opBusy.sort((a,b)=>a.s-b.s);
-    cursor=ue;
-  }
-  return result;
-}
-
+// ── Operator free-slot finder ─────────────────────────────────────────────
 function opNextFree(cursor,need,sched,opBusy){
-  let c=cursor;
-  let safety=0;
+  let c=cursor,safety=0;
   while(c+need<=sched.e&&safety++<5000){
     const br=inBrk(c);if(br){c=br.e;continue}
     const brs=BRK.find(b=>b.s>c&&b.s<c+need);if(brs){c=brs.e;continue}
@@ -288,91 +334,45 @@ function opNextFree(cursor,need,sched,opBusy){
   return null;
 }
 
-// Build flat list of operator busy blocks from already-placed jobs
 function buildOpBusy(k){
   const d=ST[k];if(!d)return[];
   const blocks=[];
-  for(let m=0;m<2;m++){
-    for(const j of d.cnc[m]){
-      if(!j.sheets_sched)continue;
-      for(const sh of j.sheets_sched){
-        blocks.push({s:sh.ls,e:sh.le});
-        blocks.push({s:sh.us,e:sh.ue});
-      }
-    }
+  for(let m=0;m<2;m++)for(const j of d.cnc[m]){
+    if(!j.sheets_sched)continue;
+    for(const sh of j.sheets_sched){blocks.push({s:sh.ls,e:sh.le});blocks.push({s:sh.us,e:sh.ue});}
   }
-  for(const j of [...d.eb,...d.labour]){
+  for(const j of [...(d.eb||[]),...(d.labour||[])])
     if(j.opBlocks)for(const b of j.opBlocks)blocks.push({s:b.s,e:b.e});
-  }
   return blocks.sort((a,b)=>a.s-b.s);
 }
 
-function placeAll(sched,k){
-  const d=ST[k];
-  // reset
-  for(let m=0;m<2;m++)for(const j of d.cnc[m]){j.sheets_sched=null;j.overflow=false;}
-  for(const j of [...d.eb,...d.labour]){j.opBlocks=null;j.overflow=false;j.schedStart=null;}
-
-  // Place CNC jobs — machine 0 first, then 1, respecting shared operator
-  for(let m=0;m<2;m++){
-    let macCursor=sched.s;
-    for(const j of d.cnc[m]){
-      if(j.carryover)continue;
-      const opBusy=buildOpBusy(k);
-      const result=schedSheets(j.sheets,j.sheetTime,j.load,j.unload,macCursor,sched,opBusy);
-      if(!result){j.overflow=true;continue;}
-      j.sheets_sched=result;
-      j.overflow=false;
-      // machine cursor advances to end of last sheet's machine run
-      // (machine can't start a new job until previous finishes)
-      macCursor=result[result.length-1].re;
-      // job-level convenience fields
-      j.jobStart=result[0].ls;
-      j.jobEnd=result[result.length-1].ue;
-      j.machEnd=result[result.length-1].re;
-    }
+// ── Sheet scheduling (per sheet: load → run → unload) ────────────────────
+function schedSheets(sheets,sheetTime,loadMins,unloadMins,startFrom,sched,opBusy){
+  const result=[];
+  let cursor=startFrom;
+  for(let i=0;i<sheets;i++){
+    const ls=opNextFree(cursor,loadMins,sched,opBusy);
+    if(ls===null)return{done:result,remaining:sheets-i};
+    const le=ls+loadMins;
+    const rs=le,re=rs+sheetTime;
+    if(re>sched.e)return{done:result,remaining:sheets-i};
+    const us=opNextFree(re,unloadMins,sched,opBusy);
+    if(us===null||us+unloadMins>sched.e)return{done:result,remaining:sheets-i};
+    const ue=us+unloadMins;
+    result.push({ls,le,rs,re,us,ue});
+    opBusy.push({s:ls,e:le});opBusy.push({s:us,e:ue});
+    opBusy.sort((a,b)=>a.s-b.s);
+    cursor=ue;
   }
-
-  // Place EB — starts after linked CNC job finishes (after last unload)
-  for(const j of d.eb){
-    if(j.carryover)continue;
-    const linked=d.cnc[j.linkedMachine].find(cj=>cj.name===j.linkedName&&!cj.overflow&&cj.sheets_sched);
-    if(!linked){j.overflow=true;continue;}
-    const earliest=linked.jobEnd; // after last unload
-    const opBusy=buildOpBusy(k);
-    const segs=fillOpSegs(j.duration,earliest,sched,opBusy);
-    if(!segs){j.overflow=true;}
-    else{j.opBlocks=segs;j.schedStart=segs[0].s;j.overflow=false;}
-  }
-
-  // Place Labour — if linked, starts after that job finishes; else fills gaps
-  for(const j of d.labour){
-    if(j.carryover)continue;
-    let earliest=sched.s;
-    if(j.linkedName){
-      let found=false;
-      for(let m=0;m<2;m++){
-        const linked=d.cnc[m].find(cj=>cj.name===j.linkedName&&!cj.overflow&&cj.sheets_sched);
-        if(linked){earliest=linked.jobEnd;found=true;break;}
-      }
-      if(!found){j.overflow=true;continue;}
-    }
-    const opBusy=buildOpBusy(k);
-    const segs=fillOpSegs(j.duration,earliest,sched,opBusy);
-    if(!segs){j.overflow=true;}
-    else{j.opBlocks=segs;j.schedStart=segs[0].s;j.overflow=false;}
-  }
+  return{done:result,remaining:0};
 }
 
-// Fill 'need' minutes of operator time in segments from 'earliest', avoiding opBusy
 function fillOpSegs(need,earliest,sched,opBusy){
-  let remaining=need;
-  let cursor=Math.max(earliest,sched.s);
-  const segs=[];
-  let safety=0;
+  let remaining=need,cursor=Math.max(earliest,sched.s);
+  const segs=[];let safety=0;
   while(remaining>0&&cursor<sched.e&&safety++<5000){
-    const br=inBrk(cursor);if(br){cursor=br.e;continue;}
-    const ob=opBusy.find(b=>b.e>cursor&&b.s<=cursor);if(ob){cursor=ob.e;continue;}
+    const br=inBrk(cursor);if(br){cursor=br.e;continue}
+    const ob=opBusy.find(b=>b.e>cursor&&b.s<=cursor);if(ob){cursor=ob.e;continue}
     const nextInt=[...BRK.map(b=>b.s),...opBusy.map(b=>b.s)].filter(t=>t>cursor).sort((a,b)=>a-b)[0];
     const avail=Math.min(sched.e,nextInt||sched.e)-cursor;
     const take=Math.min(remaining,avail);
@@ -381,6 +381,102 @@ function fillOpSegs(need,earliest,sched,opBusy){
   }
   if(remaining>0)return null;
   return segs;
+}
+
+// ── Main placement with auto carry/split ─────────────────────────────────
+function placeAll(sched,k){
+  const d=ST[k];
+  for(let m=0;m<2;m++)for(const j of d.cnc[m]){j.sheets_sched=null;j.overflow=false;}
+  for(const j of [...(d.eb||[]),...(d.labour||[])]){j.opBlocks=null;j.overflow=false;j.schedStart=null;}
+
+  for(let m=0;m<2;m++){
+    let macCursor=sched.s;
+    let prevJobLong=false;
+    for(const j of d.cnc[m]){
+      if(j.carryover)continue;
+      const opBusy=buildOpBusy(k);
+      // Apply 1hr gap after long jobs
+      let fromCursor=macCursor;
+      if(prevJobLong&&macCursor+GAP_MINS<=sched.e)fromCursor=macCursor+GAP_MINS;
+      const res=schedSheets(j.sheets,j.sheetTime,j.load,j.unload,fromCursor,sched,opBusy);
+      const done=res.done;const remaining=res.remaining;
+      if(done.length===0){
+        // Nothing fits — carry whole job
+        autoCarry(k,m,j,j.sheets);
+        j.sheets_sched=null;j.overflow=false;j.carryover=true;
+        continue;
+      }
+      j.sheets_sched=done;j.overflow=false;
+      j.jobStart=done[0].ls;j.jobEnd=done[done.length-1].ue;
+      j.machEnd=done[done.length-1].re;
+      const totalMins=done.reduce((a,sh)=>(sh.re-sh.rs),0);
+      prevJobLong=totalMins>LONG_JOB_MINS;
+      macCursor=done[done.length-1].re;
+      if(remaining>0){
+        // Auto-split remainder to next day
+        autoCarry(k,m,j,remaining);
+      }
+    }
+  }
+
+  // EB
+  for(const j of (d.eb||[])){
+    if(j.carryover)continue;
+    const linked=d.cnc[j.linkedMachine].find(cj=>cj.name===j.linkedName&&!cj.overflow&&cj.sheets_sched&&!cj.carryover);
+    if(!linked){j.overflow=true;continue;}
+    const earliest=linked.jobEnd;
+    const opBusy=buildOpBusy(k);
+    const segs=fillOpSegs(j.duration,earliest,sched,opBusy);
+    if(!segs){
+      // carry EB to next day
+      autoCarryEB(k,j);j.carryover=true;j.overflow=false;
+    } else {j.opBlocks=segs;j.schedStart=segs[0].s;j.overflow=false;}
+  }
+
+  // Labour
+  for(const j of (d.labour||[])){
+    if(j.carryover)continue;
+    let earliest=sched.s;
+    if(j.linkedName){
+      let found=false;
+      for(let m=0;m<2;m++){
+        const linked=d.cnc[m].find(cj=>cj.name===j.linkedName&&!cj.overflow&&cj.sheets_sched&&!cj.carryover);
+        if(linked){earliest=linked.jobEnd;found=true;break;}
+      }
+      if(!found){j.overflow=true;continue;}
+    }
+    const opBusy=buildOpBusy(k);
+    const segs=fillOpSegs(j.duration,earliest,sched,opBusy);
+    if(!segs){
+      autoCarryLabour(k,j);j.carryover=true;j.overflow=false;
+    } else {j.opBlocks=segs;j.schedStart=segs[0].s;j.overflow=false;}
+  }
+}
+
+function autoCarry(k,mIdx,parentJob,remSheets){
+  const nd=nwd(new Date(k));const nk=dk(nd);initDay(nk);
+  const existing=ST[nk].cnc[mIdx];
+  const already=existing.find(j=>j.splitParentId===parentJob.id);
+  if(already){already.sheets=remSheets;return;}
+  const newJ={
+    id:Date.now()+Math.random(),name:parentJob.name,sheets:remSheets,
+    sheetTime:parentJob.sheetTime,load:parentJob.load,unload:parentJob.unload,
+    color:parentJob.color,overflow:false,carryover:false,jumbo:parentJob.jumbo,
+    splitFrom:parentJob.id,splitParentId:parentJob.id,editing:false,sheets_sched:null,isCarryover:true
+  };
+  ST[nk].cnc[mIdx].unshift(newJ);
+}
+
+function autoCarryEB(k,j){
+  const nd=nwd(new Date(k));const nk=dk(nd);initDay(nk);
+  if(ST[nk].eb.find(e=>e.splitParentId===j.id))return;
+  ST[nk].eb.unshift({...j,id:Date.now()+Math.random(),opBlocks:null,schedStart:null,carryover:false,overflow:false,splitParentId:j.id,isCarryover:true});
+}
+
+function autoCarryLabour(k,j){
+  const nd=nwd(new Date(k));const nk=dk(nd);initDay(nk);
+  if(ST[nk].labour.find(l=>l.splitParentId===j.id))return;
+  ST[nk].labour.unshift({...j,id:Date.now()+Math.random(),opBlocks:null,schedStart:null,carryover:false,overflow:false,splitParentId:j.id,isCarryover:true});
 }
 
 // ── Add actions ───────────────────────────────────────────────────────────
@@ -411,7 +507,7 @@ function addEB(){
   if(!name||!dur){err.textContent='Fill in all fields.';return}
   const k=dk(cur);initDay(k);
   const linked=ST[k].cnc[mIdx].find(j=>j.name===name);
-  if(!linked){err.textContent=`No CNC job named "${name}" on ${MN[mIdx]}. Name must match exactly.`;return}
+  if(!linked){err.textContent=`No CNC job "${name}" on ${MN[mIdx]}.`;return}
   err.textContent='';
   ST[k].eb.push({id:Date.now(),name,linkedName:name,linkedMachine:mIdx,duration:dur,color:EBC,overflow:false,carryover:false,editing:false,opBlocks:null,schedStart:null});
   ['f-eb-name','f-eb-dur'].forEach(id=>document.getElementById(id).value='');
@@ -440,9 +536,7 @@ function removeJob(type,mIdx,jIdx){
   save();render();
 }
 
-function togEdit(type,mIdx,jIdx){
-  const j=gj(dk(cur),type,mIdx,jIdx);if(j)j.editing=!j.editing;render();
-}
+function togEdit(type,mIdx,jIdx){const j=gj(dk(cur),type,mIdx,jIdx);if(j)j.editing=!j.editing;render();}
 
 function gj(k,type,mIdx,jIdx){
   if(!ST[k])return null;
@@ -476,27 +570,12 @@ function splitJob(mIdx,jIdx){
   save();render();
 }
 
-function coJob(type,mIdx,jIdx){
-  const k=dk(cur);let j;
-  if(type==='cnc')j=ST[k].cnc[mIdx].splice(jIdx,1)[0];
-  else if(type==='eb')j=ST[k].eb.splice(jIdx,1)[0];
-  else j=ST[k].labour.splice(jIdx,1)[0];
-  const nd=nwd(cur);const nk=dk(nd);initDay(nk);
-  j.overflow=false;j.sheets_sched=null;j.opBlocks=null;j.schedStart=null;j.editing=false;j.carryover=false;
-  if(type==='cnc')ST[nk].cnc[mIdx].push(j);
-  else if(type==='eb')ST[nk].eb.push(j);
-  else ST[nk].labour.push(j);
-  save();render();
-}
-
-function nwd(d){let n=new Date(d);do{n.setDate(n.getDate()+1)}while(isWE(n)||!SCH[n.getDay()]);return n;}
-
 function clearDay(){
   if(!confirm('Clear all tasks for this day?'))return;
   const k=dk(cur);ST[k]={cnc:[[],[]],eb:[],labour:[]};save();render();
 }
 
-// ── Rendering ─────────────────────────────────────────────────────────────
+// ── Rendering helpers ─────────────────────────────────────────────────────
 function pc(m,s){return((m-s.s)/(s.e-s.s)*100).toFixed(3)+'%'}
 function pw(d,s){return(d/(s.e-s.s)*100).toFixed(3)+'%'}
 
@@ -518,151 +597,136 @@ function rTicks(el,s){
   }
 }
 function addSeg(tl,start,dur,color,alpha,label,s,tip){
+  if(dur<=0)return;
   const d=document.createElement('div');d.className='tlsg';
   d.style.left=pc(start,s);d.style.width=pw(dur,s);
   d.style.background=color;d.style.opacity=alpha;
   d.title=tip||label;
-  if(dur/(s.e-s.s)>0.03)d.textContent=label;
+  if(dur/(s.e-s.s)>0.028)d.textContent=label;
   tl.appendChild(d);
 }
 
-function rMachine(mIdx,sched){
-  const k=dk(cur);const list=ST[k].cnc[mIdx];
-  const dm=sched.e-sched.s;
-  const tl=document.getElementById(`tl-${mIdx}`);
+function rMachineTL(tl,bgEl,tkEl,tlsEl,mIdx,sched,k){
   tl.querySelectorAll('.tlsg').forEach(e=>e.remove());
-  rBreaks(document.getElementById(`bg-${mIdx}`),sched);
-  document.getElementById(`tls-${mIdx}`).textContent=`${ft(sched.s)}–${ft(sched.e)} (${fd(dm)} shift)`;
-  rTicks(document.getElementById(`tk-${mIdx}`),sched);
-
+  rBreaks(bgEl,sched);
+  tlsEl.textContent=`${ft(sched.s)}–${ft(sched.e)} (${fd(sched.e-sched.s)})`;
+  rTicks(tkEl,sched);
+  const list=ST[k]?ST[k].cnc[mIdx]:[];
   let macMins=0;
   for(const j of list){
-    if(j.overflow||!j.sheets_sched||j.carryover)continue;
+    if(!j.sheets_sched||j.carryover)continue;
     for(const sh of j.sheets_sched){
-      addSeg(tl,sh.ls,sh.le-sh.ls,j.color,.55,'Ld',sched,`${j.name} — Load sheet: ${ft(sh.ls)}–${ft(sh.le)}`);
+      addSeg(tl,sh.ls,sh.le-sh.ls,j.color,.55,'Ld',sched,`${j.name} — Load: ${ft(sh.ls)}–${ft(sh.le)}`);
       addSeg(tl,sh.rs,sh.re-sh.rs,j.color,1,'Run',sched,`${j.name} — Run: ${ft(sh.rs)}–${ft(sh.re)}`);
-      addSeg(tl,sh.us,sh.ue-sh.us,j.color,.65,'Ul',sched,`${j.name} — Unload sheet: ${ft(sh.us)}–${ft(sh.ue)}`);
+      addSeg(tl,sh.us,sh.ue-sh.us,j.color,.65,'Ul',sched,`${j.name} — Unload: ${ft(sh.us)}–${ft(sh.ue)}`);
       macMins+=sh.re-sh.rs;
     }
   }
-  const up=dm>0?Math.round(macMins/dm*100):0;
-  document.getElementById(`cu-${mIdx}`).textContent=`${macMins}/${dm} min (${up}%)`;
+  return macMins;
+}
 
-  const le=document.getElementById(`jl-${mIdx}`);le.innerHTML='';
+function rOpTL(tl,bgEl,tkEl,tlsEl,sched,k){
+  tl.querySelectorAll('.tlsg').forEach(e=>e.remove());
+  rBreaks(bgEl,sched);
+  tlsEl.textContent=`${ft(sched.s)}–${ft(sched.e)} (${fd(sched.e-sched.s)})`;
+  rTicks(tkEl,sched);
+  const d=ST[k];if(!d)return 0;
+  let opMins=0;
+  for(let m=0;m<2;m++)for(const j of d.cnc[m]){
+    if(!j.sheets_sched||j.carryover)continue;
+    for(const sh of j.sheets_sched){
+      addSeg(tl,sh.ls,sh.le-sh.ls,j.color,.8,'Ld',sched,`${MN[m]} Load: ${j.name} ${ft(sh.ls)}–${ft(sh.le)}`);
+      addSeg(tl,sh.us,sh.ue-sh.us,j.color,.8,'Ul',sched,`${MN[m]} Unload: ${j.name} ${ft(sh.us)}–${ft(sh.ue)}`);
+      opMins+=(sh.le-sh.ls)+(sh.ue-sh.us);
+    }
+  }
+  for(const j of (d.eb||[])){
+    if(!j.opBlocks||j.carryover)continue;
+    for(const b of j.opBlocks){addSeg(tl,b.s,b.e-b.s,EBC,.85,'EB',sched,`EB: ${j.name} ${ft(b.s)}–${ft(b.e)}`);opMins+=b.e-b.s;}
+  }
+  for(const j of (d.labour||[])){
+    if(!j.opBlocks||j.carryover)continue;
+    for(const b of j.opBlocks){addSeg(tl,b.s,b.e-b.s,LAC,.85,'Lab',sched,`Labour: ${j.name} ${ft(b.s)}–${ft(b.e)}`);opMins+=b.e-b.s;}
+  }
+  return opMins;
+}
+
+function rMachineList(le,mIdx,k,sched){
+  le.innerHTML='';
+  const list=ST[k]?ST[k].cnc[mIdx]:[];
   const vis=list.filter(j=>!j.carryover);
-  if(!vis.length){le.innerHTML='<div class="nojobs">No CNC jobs</div>';return up;}
-
+  if(!vis.length){le.innerHTML='<div class="nojobs">No CNC jobs</div>';return;}
   for(let i=0;i<list.length;i++){
     const j=list[i];if(j.carryover)continue;
-    const totalMac=j.sheets*j.sheetTime;
-    const totalOp=j.sheets*(j.load+j.unload);
+    const totalMac=j.sheets*j.sheetTime,totalOp=j.sheets*(j.load+j.unload);
     const row=document.createElement('div');row.className='ji';row.draggable=true;
     let tline='';
-    if(!j.overflow&&j.sheets_sched){
-      const first=j.sheets_sched[0],last=j.sheets_sched[j.sheets_sched.length-1];
-      tline=`<div class="jtime">First load ${ft(first.ls)} · Last unload ${ft(last.ue)} · Machine done ${ft(last.re)}</div>`;
+    if(!j.overflow&&j.sheets_sched&&j.sheets_sched.length){
+      const f=j.sheets_sched[0],l=j.sheets_sched[j.sheets_sched.length-1];
+      tline=`<div class="jtime">Load ${ft(f.ls)} · Unload ${ft(l.ue)} · Machine done ${ft(l.re)}</div>`;
     }
-    const warn=j.overflow?`<div class="jwarn">&#9888; Won't fit — reorder, split, or carry over</div>`:'';
-    let erow='';
-    if(j.editing)erow=`<div class="erow">
-      <label>Sheets</label><input id="ee-sh-${mIdx}-${i}" type="number" value="${j.sheets}" min="1" style="width:48px"/>
-      <label>Min/sh</label><input id="ee-st-${mIdx}-${i}" type="number" value="${j.sheetTime}" min="1" style="width:48px"/>
-      <label>Load</label><input id="ee-ld-${mIdx}-${i}" type="number" value="${j.load}" min="1" style="width:44px"/>
-      <label>Unload</label><input id="ee-ul-${mIdx}-${i}" type="number" value="${j.unload}" min="1" style="width:48px"/>
-      <button class="sb" onclick="svEdit('cnc',${mIdx},${i})">&#10003; Save</button></div>`;
+    const warn=j.overflow?`<div class="jwarn">&#9888; Overflow</div>`:'';
+    const coB=j.isCarryover?`<span class="bdg co">carried</span>`:'';
     const spB=j.splitFrom?`<span class="bdg sp">split</span>`:'';
     const jbB=(mIdx===0&&j.jumbo)?`<span class="bdg jb">jumbo</span>`:'';
+    let erow='';
+    if(j.editing)erow=`<div class="erow">
+      <label>Sheets</label><input id="ee-sh-${mIdx}-${i}" type="number" value="${j.sheets}" min="1" style="width:46px"/>
+      <label>Min/sh</label><input id="ee-st-${mIdx}-${i}" type="number" value="${j.sheetTime}" min="1" style="width:46px"/>
+      <label>Load</label><input id="ee-ld-${mIdx}-${i}" type="number" value="${j.load}" min="1" style="width:42px"/>
+      <label>Unload</label><input id="ee-ul-${mIdx}-${i}" type="number" value="${j.unload}" min="1" style="width:46px"/>
+      <button class="sb" onclick="svEdit('cnc',${mIdx},${i})">&#10003; Save</button></div>`;
     row.innerHTML=`<span class="grip">&#8801;</span>
       <div class="jdot" style="background:${j.color}"></div>
       <div class="ji-info">
-        <div class="jn">${eh(j.name)}${spB}${jbB}</div>
-        <div class="jmeta">${j.sheets}sh × (${j.load}+${j.sheetTime}+${j.unload})min = <strong>${fd(totalOp+totalMac)}</strong> total · Op: ${fd(totalOp)} · Machine: ${fd(totalMac)}</div>
+        <div class="jn">${eh(j.name)}${coB}${spB}${jbB}</div>
+        <div class="jmeta">${j.sheets}sh×(${j.load}+${j.sheetTime}+${j.unload})=<strong>${fd(totalOp+totalMac)}</strong> · Op:${fd(totalOp)} · Mac:${fd(totalMac)}</div>
         ${tline}${warn}${erow}
       </div>
       <div class="jacts">
         <button onclick="togEdit('cnc',${mIdx},${i})" title="Edit">&#9998;</button>
         <button onclick="splitJob(${mIdx},${i})" title="Split">&#9988;</button>
-        ${j.overflow?`<button onclick="coJob('cnc',${mIdx},${i})" title="Carry over" style="color:#a06010">&#8680;</button>`:''}
         <button onclick="removeJob('cnc',${mIdx},${i})" title="Remove" style="color:#c04040">&#10005;</button>
       </div>`;
     setupDrag(row,'cnc',mIdx,i,le,mIdx);
     le.appendChild(row);
   }
-  return up;
 }
 
-function rOperator(sched){
-  const k=dk(cur);const d=ST[k];
-  const dm=sched.e-sched.s;
-  const tl=document.getElementById('tl-op');
-  tl.querySelectorAll('.tlsg').forEach(e=>e.remove());
-  rBreaks(document.getElementById('bg-op'),sched);
-  document.getElementById('tls-op').textContent=`${ft(sched.s)}–${ft(sched.e)} (${fd(dm)} shift)`;
-  rTicks(document.getElementById('tk-op'),sched);
-
-  let opMins=0;
-  for(let m=0;m<2;m++){
-    for(const j of d.cnc[m]){
-      if(!j.sheets_sched||j.carryover)continue;
-      for(const sh of j.sheets_sched){
-        addSeg(tl,sh.ls,sh.le-sh.ls,j.color,.8,'Ld',sched,`${MN[m]} Load: ${j.name} ${ft(sh.ls)}–${ft(sh.le)}`);
-        addSeg(tl,sh.us,sh.ue-sh.us,j.color,.8,'Ul',sched,`${MN[m]} Unload: ${j.name} ${ft(sh.us)}–${ft(sh.ue)}`);
-        opMins+=(sh.le-sh.ls)+(sh.ue-sh.us);
-      }
-    }
-  }
-  for(const j of d.eb){
-    if(!j.opBlocks||j.carryover)continue;
-    for(const b of j.opBlocks){
-      addSeg(tl,b.s,b.e-b.s,EBC,.85,'EB',sched,`EB: ${j.name} ${ft(b.s)}–${ft(b.e)}`);
-      opMins+=b.e-b.s;
-    }
-  }
-  for(const j of d.labour){
-    if(!j.opBlocks||j.carryover)continue;
-    for(const b of j.opBlocks){
-      addSeg(tl,b.s,b.e-b.s,LAC,.85,'Lab',sched,`Labour: ${j.name} ${ft(b.s)}–${ft(b.e)}`);
-      opMins+=b.e-b.s;
-    }
-  }
-  const up=dm>0?Math.round(opMins/dm*100):0;
-  document.getElementById('cu-op').textContent=`${opMins}/${dm} min (${up}%)`;
-
-  const le=document.getElementById('jl-op');le.innerHTML='';
+function rOpList(le,k){
+  le.innerHTML='';
+  const d=ST[k];if(!d)return;
   const all=[
-    ...d.eb.filter(j=>!j.carryover).map((j,i)=>({j,type:'eb',i})),
-    ...d.labour.filter(j=>!j.carryover).map((j,i)=>({j,type:'labour',i}))
+    ...(d.eb||[]).filter(j=>!j.carryover).map((j,i)=>({j,type:'eb',i})),
+    ...(d.labour||[]).filter(j=>!j.carryover).map((j,i)=>({j,type:'labour',i}))
   ];
-  if(!all.length){le.innerHTML='<div class="nojobs">No edgebanding or labour tasks</div>';return up;}
-  for(const {j,type,i} of all){
+  if(!all.length){le.innerHTML='<div class="nojobs">No edgebanding or labour</div>';return;}
+  for(const{j,type,i}of all){
     const row=document.createElement('div');row.className='ji';
     const col=type==='eb'?EBC:LAC;
     const lbl=type==='eb'?'Edgebanding':'Labour';
     const bcls=type==='eb'?'eb':'lb';
     let tline='';
-    if(!j.overflow&&j.opBlocks&&j.opBlocks.length){
-      tline=`<div class="jtime">Segments: ${j.opBlocks.map(b=>ft(b.s)+'–'+ft(b.e)).join(', ')}</div>`;
-    }
-    const warn=j.overflow?`<div class="jwarn">&#9888; Won't fit today</div>`:'';
+    if(!j.overflow&&j.opBlocks&&j.opBlocks.length)
+      tline=`<div class="jtime">${j.opBlocks.map(b=>ft(b.s)+'–'+ft(b.e)).join(', ')}</div>`;
+    const warn=j.overflow?`<div class="jwarn">&#9888; Overflow</div>`:'';
+    const coB=j.isCarryover?`<span class="bdg co">carried</span>`:'';
     const linkInfo=type==='eb'
-      ?`<div class="jmeta">Linked: ${eh(j.linkedName)} on ${MN[j.linkedMachine]} · ${fd(j.duration)} total</div>`
-      :`<div class="jmeta">${j.linkedName?'After job: '+eh(j.linkedName)+' · ':''} ${fd(j.duration)} total</div>`;
+      ?`<div class="jmeta">&#8594; ${eh(j.linkedName)} (${MN[j.linkedMachine]}) · ${fd(j.duration)}</div>`
+      :`<div class="jmeta">${j.linkedName?'&#8594; '+eh(j.linkedName)+' · ':' '}${fd(j.duration)}</div>`;
     let erow='';
-    if(j.editing)erow=`<div class="erow"><label>Duration (mins)</label><input id="ee-dur-${type}-${i}" type="number" value="${j.duration}" min="1"/><button class="sb" onclick="svEdit('${type}',0,${i})">&#10003; Save</button></div>`;
-    row.innerHTML=`<span class="grip" style="cursor:default;color:transparent">&#8801;</span>
-      <div class="jdot" style="background:${col}"></div>
+    if(j.editing)erow=`<div class="erow"><label>Dur(mins)</label><input id="ee-dur-${type}-${i}" type="number" value="${j.duration}" min="1"/><button class="sb" onclick="svEdit('${type}',0,${i})">&#10003; Save</button></div>`;
+    row.innerHTML=`<div class="jdot" style="background:${col};margin-top:3px;flex-shrink:0"></div>
       <div class="ji-info">
-        <div class="jn">${eh(j.name)} <span class="bdg ${bcls}">${lbl}</span></div>
+        <div class="jn">${eh(j.name)} <span class="bdg ${bcls}">${lbl}</span>${coB}</div>
         ${linkInfo}${tline}${warn}${erow}
       </div>
       <div class="jacts">
         <button onclick="togEdit('${type}',0,${i})" title="Edit">&#9998;</button>
-        ${j.overflow?`<button onclick="coJob('${type}',0,${i})" title="Carry over" style="color:#a06010">&#8680;</button>`:''}
         <button onclick="removeJob('${type}',0,${i})" title="Remove" style="color:#c04040">&#10005;</button>
       </div>`;
     le.appendChild(row);
   }
-  return up;
 }
 
 function setupDrag(row,type,mIdx,jIdx,listEl,tgtMIdx){
@@ -670,47 +734,94 @@ function setupDrag(row,type,mIdx,jIdx,listEl,tgtMIdx){
   row.addEventListener('dragend',()=>{row.classList.remove('dragging');document.querySelectorAll('.ji').forEach(r=>r.classList.remove('drag-over'));});
   row.addEventListener('dragover',e=>{e.preventDefault();document.querySelectorAll('.ji').forEach(r=>r.classList.remove('drag-over'));row.classList.add('drag-over');});
   row.addEventListener('drop',e=>{
-    e.preventDefault();
-    if(DS.type!=='cnc'||type!=='cnc')return;
+    e.preventDefault();if(DS.type!=='cnc'||type!=='cnc')return;
     const k=dk(cur);
-    if(DS.mIdx===tgtMIdx){
-      const arr=ST[k].cnc[tgtMIdx];const[m]=arr.splice(DS.fi,1);arr.splice(jIdx,0,m);
-    } else {
-      const[m]=ST[k].cnc[DS.mIdx].splice(DS.fi,1);ST[k].cnc[tgtMIdx].splice(jIdx,0,m);
-    }
+    if(DS.mIdx===tgtMIdx){const arr=ST[k].cnc[tgtMIdx];const[m]=arr.splice(DS.fi,1);arr.splice(jIdx,0,m);}
+    else{const[m]=ST[k].cnc[DS.mIdx].splice(DS.fi,1);ST[k].cnc[tgtMIdx].splice(jIdx,0,m);}
     DS={type:null,mIdx:null,fi:null};save();render();
   });
   listEl.addEventListener('dragover',e=>e.preventDefault());
   listEl.addEventListener('drop',e=>{
-    e.preventDefault();
-    if(DS.type!=='cnc'||DS.mIdx===tgtMIdx)return;
+    e.preventDefault();if(DS.type!=='cnc'||DS.mIdx===tgtMIdx)return;
     const k=dk(cur);const[m]=ST[k].cnc[DS.mIdx].splice(DS.fi,1);ST[k].cnc[tgtMIdx].push(m);
     DS={type:null,mIdx:null,fi:null};save();render();
   });
 }
 
+// ── Day stats for weekly/monthly ──────────────────────────────────────────
+function getDayStats(dateObj){
+  const sched=gs(dateObj);const k=dk(dateObj);
+  if(!sched||isWE(dateObj))return null;
+  initDay(k);placeAll(sched,k);save();
+  const d=ST[k];const dm=sched.e-sched.s;
+  let mac0=0,mac1=0,opMins=0;
+  for(const j of d.cnc[0])if(j.sheets_sched&&!j.carryover)for(const sh of j.sheets_sched)mac0+=sh.re-sh.rs;
+  for(const j of d.cnc[1])if(j.sheets_sched&&!j.carryover)for(const sh of j.sheets_sched)mac1+=sh.re-sh.rs;
+  for(let m=0;m<2;m++)for(const j of d.cnc[m])if(j.sheets_sched&&!j.carryover)for(const sh of j.sheets_sched)opMins+=(sh.le-sh.ls)+(sh.ue-sh.us);
+  for(const j of (d.eb||[]))if(j.opBlocks&&!j.carryover)for(const b of j.opBlocks)opMins+=b.e-b.s;
+  for(const j of (d.labour||[]))if(j.opBlocks&&!j.carryover)for(const b of j.opBlocks)opMins+=b.e-b.s;
+  const jobCount=d.cnc[0].filter(j=>!j.carryover).length+d.cnc[1].filter(j=>!j.carryover).length+
+    (d.eb||[]).filter(j=>!j.carryover).length+(d.labour||[]).filter(j=>!j.carryover).length;
+  return{dm,mac0,mac1,opMins,u0:Math.round(mac0/dm*100),u1:Math.round(mac1/dm*100),uop:Math.round(opMins/dm*100),jobCount,sched,k};
+}
+
+// ── Render daily ──────────────────────────────────────────────────────────
+function renderDaily(){
+  const sched=gs(cur);const k=dk(cur);
+  document.getElementById('dlabel').textContent=`${DAYS[cur.getDay()]}, ${cur.getDate()} ${MONTHS_S[cur.getMonth()]} ${cur.getFullYear()}`;
+  initDay(k);
+  if(!sched||isWE(cur)){
+    ['s-shift','s-u0','s-u1','s-uop','s-jobs'].forEach(id=>document.getElementById(id).textContent='—');
+    for(let m=0;m<2;m++){
+      ['tls','tl','tk','jl'].forEach(p=>{const el=document.getElementById(`${p}-${m}`);if(el){if(p==='jl')el.innerHTML='<div class="nojobs">No shift</div>';else if(p==='tl')el.querySelectorAll('.tlsg').forEach(e=>e.remove());else el.innerHTML='';}});
+      document.getElementById(`cu-${m}`).textContent='—';
+    }
+    document.getElementById('jl-op').innerHTML='<div class="nojobs">No shift</div>';
+    document.getElementById('ov-banner').classList.remove('show');
+    rCarryover();return;
+  }
+  placeAll(sched,k);save();
+  const dm=sched.e-sched.s;
+  document.getElementById('s-shift').textContent=fd(dm);
+  const mac0=rMachineTL(document.getElementById('tl-0'),document.getElementById('bg-0'),document.getElementById('tk-0'),document.getElementById('tls-0'),0,sched,k);
+  const mac1=rMachineTL(document.getElementById('tl-1'),document.getElementById('bg-1'),document.getElementById('tk-1'),document.getElementById('tls-1'),1,sched,k);
+  const opMins=rOpTL(document.getElementById('tl-op'),document.getElementById('bg-op'),document.getElementById('tk-op'),document.getElementById('tls-op'),sched,k);
+  rMachineList(document.getElementById('jl-0'),0,k,sched);
+  rMachineList(document.getElementById('jl-1'),1,k,sched);
+  rOpList(document.getElementById('jl-op'),k);
+  const u0=Math.round(mac0/dm*100),u1=Math.round(mac1/dm*100),uop=Math.round(opMins/dm*100);
+  const su=(id,p)=>{const el=document.getElementById(id);el.textContent=p+'%';el.className='sval '+(p>=85?'bad':p>50?'warn':p>0?'ok':'');};
+  su('s-u0',u0);su('s-u1',u1);su('s-uop',uop);
+  document.getElementById('cu-0').textContent=`${mac0}/${dm}min (${u0}%)`;
+  document.getElementById('cu-1').textContent=`${mac1}/${dm}min (${u1}%)`;
+  document.getElementById('cu-op').textContent=`${opMins}/${dm}min (${uop}%)`;
+  const d=ST[k];
+  const tot=d.cnc[0].filter(j=>!j.carryover).length+d.cnc[1].filter(j=>!j.carryover).length+(d.eb||[]).filter(j=>!j.carryover).length+(d.labour||[]).filter(j=>!j.carryover).length;
+  document.getElementById('s-jobs').textContent=tot;
+  document.getElementById('ov-banner').classList.remove('show');
+  rCarryover();
+}
+
 function rCarryover(){
-  const tk=dk(cur);
-  const items=[];
+  const tk=dk(cur);const items=[];
   for(const k of Object.keys(ST).sort()){
     if(k<=tk)continue;
     const d=ST[k];if(!d)continue;
     const dt=new Date(k+'T12:00:00');
-    for(let m=0;m<2;m++)d.cnc[m].forEach((j,i)=>items.push({k,type:'cnc',mIdx:m,i,j,dt}));
-    d.eb.forEach((j,i)=>items.push({k,type:'eb',mIdx:0,i,j,dt}));
-    d.labour.forEach((j,i)=>items.push({k,type:'labour',mIdx:0,i,j,dt}));
+    for(let m=0;m<2;m++)(d.cnc[m]||[]).forEach((j,i)=>{if(j.isCarryover)items.push({k,type:'cnc',mIdx:m,i,j,dt});});
+    (d.eb||[]).forEach((j,i)=>{if(j.isCarryover)items.push({k,type:'eb',mIdx:0,i,j,dt});});
+    (d.labour||[]).forEach((j,i)=>{if(j.isCarryover)items.push({k,type:'labour',mIdx:0,i,j,dt});});
   }
-  const sec=document.getElementById('cosec');
-  const lst=document.getElementById('colist');
-  if(!items.length){sec.style.display='none';return}
+  const sec=document.getElementById('cosec');const lst=document.getElementById('colist');
+  if(!items.length){sec.style.display='none';return;}
   sec.style.display='block';lst.innerHTML='';
   for(const ci of items){
     const{j,k,type,mIdx,i,dt}=ci;
     const col=type==='eb'?EBC:type==='labour'?LAC:j.color;
-    const lbl=type==='cnc'?`CNC (${MN[mIdx]})`:type==='eb'?'Edgebanding':'Labour';
+    const lbl=type==='cnc'?`CNC (${MN[mIdx]})`:type==='eb'?'EB':'Labour';
     const di=document.createElement('div');di.className='coi';
     di.innerHTML=`<div class="coi-dot" style="background:${col}"></div>
-      <div class="coi-info"><strong>${eh(j.name)}</strong> — ${lbl} · ${DAYS[dt.getDay()]} ${dt.getDate()} ${MONTHS[dt.getMonth()]} ${dt.getFullYear()}</div>
+      <div class="coi-info"><strong>${eh(j.name)}</strong> — ${lbl}${type==='cnc'?' · '+j.sheets+' sheets':''} · ${DAYS[dt.getDay()]} ${dt.getDate()} ${MONTHS_S[dt.getMonth()]} ${dt.getFullYear()}</div>
       <div><button onclick="rmCo('${k}','${type}',${mIdx},${i})">&#10005;</button></div>`;
     lst.appendChild(di);
   }
@@ -724,57 +835,131 @@ function rmCo(k,type,mIdx,i){
   save();render();
 }
 
-function render(){
-  const sched=gs(cur);
-  const dow=cur.getDay();
-  document.getElementById('dlabel').textContent=`${DAYS[dow]}, ${cur.getDate()} ${MONTHS[cur.getMonth()]} ${cur.getFullYear()}`;
-  const k=dk(cur);initDay(k);
-
-  if(!sched||isWE(cur)){
-    ['s-shift','s-u0','s-u1','s-uop','s-jobs'].forEach(id=>document.getElementById(id).textContent='—');
-    for(let m=0;m<2;m++){
-      document.getElementById(`tls-${m}`).textContent='No shift';
-      document.getElementById(`bg-${m}`).innerHTML='';
-      document.getElementById(`tk-${m}`).innerHTML='';
-      document.getElementById(`tl-${m}`).querySelectorAll('.tlsg').forEach(e=>e.remove());
-      document.getElementById(`jl-${m}`).innerHTML='<div class="nojobs">No shift</div>';
-      document.getElementById(`cu-${m}`).textContent='—';
-    }
-    ['tls-op','bg-op','tk-op'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='';});
-    document.getElementById('tl-op').querySelectorAll('.tlsg').forEach(e=>e.remove());
-    document.getElementById('jl-op').innerHTML='<div class="nojobs">No shift</div>';
-    document.getElementById('cu-op').textContent='—';
-    document.getElementById('ov-banner').classList.remove('show');
-    rCarryover();return;
-  }
-
-  placeAll(sched,k);
-  const dm=sched.e-sched.s;
-  document.getElementById('s-shift').textContent=fd(dm);
-  const u0=rMachine(0,sched);
-  const u1=rMachine(1,sched);
-  const uop=rOperator(sched);
-
-  const su=(id,p)=>{const el=document.getElementById(id);el.textContent=p+'%';el.className='sval '+(p>=95?'bad':p>75?'warn':p>0?'ok':'');};
-  su('s-u0',u0);su('s-u1',u1);su('s-uop',uop);
-
-  const d=ST[k];
-  const tot=d.cnc[0].filter(j=>!j.carryover).length+d.cnc[1].filter(j=>!j.carryover).length
-    +d.eb.filter(j=>!j.carryover).length+d.labour.filter(j=>!j.carryover).length;
-  document.getElementById('s-jobs').textContent=tot;
-
-  const ovs=[];
-  for(let m=0;m<2;m++)d.cnc[m].forEach(j=>{if(j.overflow&&!j.carryover)ovs.push(`"${j.name}" (${MN[m]})`)});
-  d.eb.forEach(j=>{if(j.overflow&&!j.carryover)ovs.push(`"${j.name}" (EB)`)});
-  d.labour.forEach(j=>{if(j.overflow&&!j.carryover)ovs.push(`"${j.name}" (Labour)`)});
-  const ob=document.getElementById('ov-banner');
-  if(ovs.length){document.getElementById('ov-text').textContent=ovs.join(', ')+' — cannot fit in shift';ob.classList.add('show');}
-  else ob.classList.remove('show');
-
-  rCarryover();
+// ── Weekly view ───────────────────────────────────────────────────────────
+function getWeekDays(){
+  const d=new Date(cur);
+  const dow=d.getDay();
+  const monday=new Date(d);monday.setDate(d.getDate()-(dow===0?6:dow-1));
+  const days=[];
+  for(let i=0;i<5;i++){const dd=new Date(monday);dd.setDate(monday.getDate()+i);days.push(dd);}
+  return days;
 }
 
-function chDay(d){const n=new Date(cur);n.setDate(n.getDate()+d);cur=n;render();}
+function renderWeekly(){
+  const days=getWeekDays();
+  const panels={felder:'wd-felder',axyz:'wd-axyz',operator:'wd-operator'};
+  for(const[tab,elId]of Object.entries(panels)){
+    const container=document.getElementById(elId);container.innerHTML='';
+    for(const dayObj of days){
+      const sched=gs(dayObj);const k=dk(dayObj);
+      const dayLabel=`${DAYS[dayObj.getDay()]} ${dayObj.getDate()} ${MONTHS_S[dayObj.getMonth()]}`;
+      const wday=document.createElement('div');wday.className='wday';
+      if(!sched){
+        wday.innerHTML=`<div class="wday-hdr"><span class="wday-name">${dayLabel}</span><span class="wday-util" style="color:#bbb">Weekend</span></div>`;
+        container.appendChild(wday);continue;
+      }
+      initDay(k);placeAll(sched,k);save();
+      const d=ST[k];const dm=sched.e-sched.s;
+      let mac0=0,mac1=0,opMins=0;
+      for(const j of d.cnc[0])if(j.sheets_sched&&!j.carryover)for(const sh of j.sheets_sched)mac0+=sh.re-sh.rs;
+      for(const j of d.cnc[1])if(j.sheets_sched&&!j.carryover)for(const sh of j.sheets_sched)mac1+=sh.re-sh.rs;
+      for(let m=0;m<2;m++)for(const j of d.cnc[m])if(j.sheets_sched&&!j.carryover)for(const sh of j.sheets_sched)opMins+=(sh.le-sh.ls)+(sh.ue-sh.us);
+      for(const j of(d.eb||[]))if(j.opBlocks&&!j.carryover)for(const b of j.opBlocks)opMins+=b.e-b.s;
+      for(const j of(d.labour||[]))if(j.opBlocks&&!j.carryover)for(const b of j.opBlocks)opMins+=b.e-b.s;
+      const u0=Math.round(mac0/dm*100),u1=Math.round(mac1/dm*100),uop=Math.round(opMins/dm*100);
+      const util=tab==='felder'?u0:tab==='axyz'?u1:uop;
+      const utilStr=tab==='felder'?`Felder ${u0}%`:tab==='axyz'?`AXYZ ${u1}%`:`Operator ${uop}%`;
+      const utilCls=util>=85?'bad':util>50?'warn':util>0?'ok':'';
+      wday.innerHTML=`<div class="wday-hdr" onclick="cur=new Date('${k}T12:00:00');setView('daily')">
+        <span class="wday-name">${dayLabel}</span>
+        <span class="wday-util ${utilCls}">${utilStr}</span>
+      </div>
+      <div class="wday-body">
+        <div style="margin-bottom:4px">
+          <div class="tls" id="wtls-${tab}-${k}"></div>
+          <div class="tl" id="wtl-${tab}-${k}" style="height:22px"><div class="tlbg" id="wbg-${tab}-${k}"></div></div>
+          <div class="tkrow" id="wtk-${tab}-${k}" style="height:10px;margin-bottom:4px"></div>
+          <div class="bleg"><div class="bsw"></div><span class="blt">Break</span></div>
+        </div>
+        <div class="jlist" id="wjl-${tab}-${k}"></div>
+      </div>`;
+      container.appendChild(wday);
+      // Now render TL and list
+      const tlEl=document.getElementById(`wtl-${tab}-${k}`);
+      const bgEl=document.getElementById(`wbg-${tab}-${k}`);
+      const tkEl=document.getElementById(`wtk-${tab}-${k}`);
+      const tlsEl=document.getElementById(`wtls-${tab}-${k}`);
+      const jlEl=document.getElementById(`wjl-${tab}-${k}`);
+      if(tab==='felder'){rMachineTL(tlEl,bgEl,tkEl,tlsEl,0,sched,k);rMachineList(jlEl,0,k,sched);}
+      else if(tab==='axyz'){rMachineTL(tlEl,bgEl,tkEl,tlsEl,1,sched,k);rMachineList(jlEl,1,k,sched);}
+      else{rOpTL(tlEl,bgEl,tkEl,tlsEl,sched,k);rOpList(jlEl,k);}
+    }
+  }
+}
+
+// ── Monthly view ──────────────────────────────────────────────────────────
+function renderMonthly(){
+  document.getElementById('month-label').textContent=`${MONTHS_L[monthRef.getMonth()]} ${monthRef.getFullYear()}`;
+  const cal=document.getElementById('mcal');cal.innerHTML='';
+  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(d=>{
+    const h=document.createElement('div');h.className='mcal-hdr';h.textContent=d;cal.appendChild(h);
+  });
+  const y=monthRef.getFullYear(),mo=monthRef.getMonth();
+  const first=new Date(y,mo,1);
+  const startDow=first.getDay()===0?6:first.getDay()-1;
+  for(let i=0;i<startDow;i++){const e=document.createElement('div');e.className='mday empty';cal.appendChild(e);}
+  const daysInMonth=new Date(y,mo+1,0).getDate();
+  for(let d=1;d<=daysInMonth;d++){
+    const dateObj=new Date(y,mo,d);const k=dk(dateObj);
+    const cell=document.createElement('div');cell.className='mday';
+    const todayKey=dk(new Date());if(k===todayKey)cell.classList.add('today');
+    if(k===dk(cur))cell.classList.add('selected');
+    const isWEnd=isWE(dateObj);
+    const dayNum=document.createElement('div');dayNum.className='mday-num'+(isWEnd?' weekend':'');dayNum.textContent=d;cell.appendChild(dayNum);
+    if(!isWEnd&&gs(dateObj)){
+      initDay(k);placeAll(gs(dateObj),k);save();
+      const dd=ST[k];const sched=gs(dateObj);const dm=sched.e-sched.s;
+      let mac0=0,mac1=0,opMins=0;
+      for(const j of dd.cnc[0])if(j.sheets_sched&&!j.carryover)for(const sh of j.sheets_sched)mac0+=sh.re-sh.rs;
+      for(const j of dd.cnc[1])if(j.sheets_sched&&!j.carryover)for(const sh of j.sheets_sched)mac1+=sh.re-sh.rs;
+      for(let m=0;m<2;m++)for(const j of dd.cnc[m])if(j.sheets_sched&&!j.carryover)for(const sh of j.sheets_sched)opMins+=(sh.le-sh.ls)+(sh.ue-sh.us);
+      for(const j of(dd.eb||[]))if(j.opBlocks&&!j.carryover)for(const b of j.opBlocks)opMins+=b.e-b.s;
+      for(const j of(dd.labour||[]))if(j.opBlocks&&!j.carryover)for(const b of j.opBlocks)opMins+=b.e-b.s;
+      const avgU=Math.round((mac0+mac1)/(dm*2)*100);
+      const bar=document.createElement('div');bar.className='mday-util-bar';
+      const fill=document.createElement('div');fill.className='mday-util-fill'+(avgU>=85?' bad':avgU>50?' warn':'');
+      fill.style.width=avgU+'%';bar.appendChild(fill);cell.appendChild(bar);
+      const jobs=dd.cnc[0].filter(j=>!j.carryover).length+dd.cnc[1].filter(j=>!j.carryover).length;
+      const jobsDiv=document.createElement('div');jobsDiv.className='mday-jobs';
+      jobsDiv.innerHTML=`F:${Math.round(mac0/dm*100)}% A:${Math.round(mac1/dm*100)}%${jobs?'<br>'+jobs+' job'+(jobs!==1?'s':''):''}`;
+      cell.appendChild(jobsDiv);
+      const lead=document.createElement('div');
+      lead.className='mday-lead '+(avgU>=85?'red':avgU>50?'amber':'green');
+      lead.textContent=avgU>=85?'Full':avgU>50?'Busy':'Available';
+      cell.appendChild(lead);
+      cell.onclick=()=>{cur=new Date(y,mo,d);setView('daily');};
+    } else {
+      cell.classList.add('empty');
+    }
+    cal.appendChild(cell);
+  }
+}
+
+// ── View switching ────────────────────────────────────────────────────────
+function setView(v){
+  curView=v;
+  ['daily','weekly','monthly'].forEach(vv=>{
+    document.getElementById('view-'+vv).style.display=vv===v?'block':'none';
+    document.querySelectorAll('.vtab').forEach((t,i)=>{if(['daily','weekly','monthly'][i]===v)t.classList.add('active');else t.classList.remove('active');});
+  });
+  render();
+}
+
+function swWTab(t){
+  curWTab=t;
+  document.querySelectorAll('.wtab').forEach((b,i)=>{b.classList.toggle('active',['felder','axyz','operator'][i]===t);});
+  document.querySelectorAll('.wpanel').forEach((p,i)=>{p.classList.toggle('active',['felder','axyz','operator'][i]===t);});
+}
 
 function swTab(t){
   document.querySelectorAll('.tabb').forEach((b,i)=>{b.classList.toggle('active',['cnc','eb','labour'][i]===t);});
@@ -783,28 +968,36 @@ function swTab(t){
   document.getElementById('errmsg').textContent='';
 }
 
+function chDay(d){const n=new Date(cur);n.setDate(n.getDate()+d);cur=n;render();}
+function chMonth(d){monthRef=new Date(monthRef.getFullYear(),monthRef.getMonth()+d,1);renderMonthly();}
+
+function render(){
+  if(curView==='daily')renderDaily();
+  else if(curView==='weekly')renderWeekly();
+  else renderMonthly();
+}
+
+// ── Export / Backup ───────────────────────────────────────────────────────
 function expCSV(){
   const k=dk(cur);const sched=gs(cur);
   if(!sched||isWE(cur)){alert('No shift on this day.');return}
   const d=ST[k];if(!d)return;
-  let csv='Type,Machine,Job,Sheets,Min/sheet,Load/sheet,Unload/sheet,Total op mins,Total machine mins,First load,Last unload,Machine done,Overflow\n';
-  for(let m=0;m<2;m++)d.cnc[m].forEach(j=>{
-    const tm=j.sheets*j.sheetTime;const top=j.sheets*(j.load+j.unload);
+  let csv='Type,Machine,Job,Sheets,Min/sheet,Load/sheet,Unload/sheet,First load,Last unload,Machine done,Overflow\n';
+  for(let m=0;m<2;m++)(d.cnc[m]||[]).forEach(j=>{
     const ss=j.sheets_sched;
-    csv+=`CNC,${MN[m]},"${j.name}",${j.sheets},${j.sheetTime},${j.load},${j.unload},${top},${tm},`;
-    csv+=ss?`${ft(ss[0].ls)},${ft(ss[ss.length-1].ue)},${ft(ss[ss.length-1].re)},No\n`:`,,,Yes\n`;
+    csv+=`CNC,${MN[m]},"${j.name}",${j.sheets},${j.sheetTime},${j.load},${j.unload},`;
+    csv+=ss&&ss.length?`${ft(ss[0].ls)},${ft(ss[ss.length-1].ue)},${ft(ss[ss.length-1].re)},No\n`:`,,,Yes\n`;
   });
-  d.eb.forEach(j=>{const segs=j.opBlocks?j.opBlocks.map(b=>ft(b.s)+'-'+ft(b.e)).join('|'):'';csv+=`EB,,"${j.name}",,,,,${j.duration},,,,,"${segs}",${j.overflow?'Yes':'No'}\n`;});
-  d.labour.forEach(j=>{const segs=j.opBlocks?j.opBlocks.map(b=>ft(b.s)+'-'+ft(b.e)).join('|'):'';csv+=`Labour,,"${j.name}",,,,,${j.duration},,,,,"${segs}",${j.overflow?'Yes':'No'}\n`;});
+  (d.eb||[]).forEach(j=>{const s=j.opBlocks?j.opBlocks.map(b=>ft(b.s)+'-'+ft(b.e)).join('|'):'';csv+=`EB,,"${j.name}",,,,,,,,"${s}",${j.overflow?'Yes':'No'}\n`;});
+  (d.labour||[]).forEach(j=>{const s=j.opBlocks?j.opBlocks.map(b=>ft(b.s)+'-'+ft(b.e)).join('|'):'';csv+=`Labour,,"${j.name}",,,,,,,,"${s}",${j.overflow?'Yes':'No'}\n`;});
   const blob=new Blob([csv],{type:'text/csv'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`CNC_Schedule_${k}.csv`;a.click();
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`CNC_${k}.csv`;a.click();
 }
 
 function backup(){
-  const blob=new Blob([JSON.stringify({version:3,exported:new Date().toISOString(),ST,cc},null,2)],{type:'application/json'});
+  const blob=new Blob([JSON.stringify({version:4,exported:new Date().toISOString(),ST,cc},null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download=`CNC_Planner_Backup_${new Date().toISOString().slice(0,10)}.json`;
-  a.click();URL.revokeObjectURL(a.href);
+  a.download=`CNC_Backup_${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(a.href);
 }
 
 function restore(event){
@@ -814,15 +1007,14 @@ function restore(event){
     try{
       const p=JSON.parse(e.target.result);
       if(!p.ST){alert('Invalid backup.');return}
-      if(!confirm(`Restore backup from ${p.exported?new Date(p.exported).toLocaleString():'unknown'}?\nReplaces all current data.`))return;
+      if(!confirm(`Restore from ${p.exported?new Date(p.exported).toLocaleString():'unknown'}?`))return;
       ST=p.ST;cc=p.cc||0;save();render();alert('Restored.');
-    }catch(err){alert('Could not read backup file.');}
+    }catch(err){alert('Could not read backup.');}
   };
   reader.readAsText(file);event.target.value='';
 }
 
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
-
 load();render();
 </script>
 </body>
