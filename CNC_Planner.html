@@ -140,6 +140,26 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f3f0;color:#11
 .badd{height:30px;padding:0 12px;background:#111;border:1px solid #111;border-radius:5px;cursor:pointer;font-size:12px;color:#fff;white-space:nowrap}
 .badd:hover{background:#333}
 .err{font-size:11px;color:#a02020;margin-top:4px;min-height:13px}
+.ohbtn{background:#fff;border:1px solid #d0cfc9;border-radius:7px;padding:4px 9px;cursor:pointer;color:#111;font-size:12px;display:inline-flex;align-items:center;gap:4px}
+.ohbtn:hover{background:#ece9e3}
+.oh-panel{background:#fff;border:1px solid #dddbd5;border-radius:10px;padding:.75rem .9rem;margin-bottom:.9rem;display:none}
+.oh-panel.open{display:block}
+.oh-panel h3{font-size:12px;font-weight:600;margin-bottom:.6rem;color:#111;display:flex;align-items:center;justify-content:space-between}
+.oh-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:.75rem}
+.oh-field{display:flex;flex-direction:column;gap:3px}
+.oh-field label{font-size:10px;color:#888;font-weight:500}
+.oh-field input,.oh-field select{height:28px;padding:0 6px;font-size:12px;border:1px solid #ccc;border-radius:5px;background:#fff;color:#111;width:100%}
+.oh-overrides{margin-top:.5rem}
+.oh-overrides h4{font-size:11px;font-weight:600;color:#555;margin-bottom:.4rem}
+.oh-list{display:flex;flex-direction:column;gap:4px;max-height:180px;overflow-y:auto}
+.oh-item{display:flex;align-items:center;gap:8px;font-size:11px;padding:4px 7px;background:#faf9f6;border-radius:6px;border:1px solid #ece9e3}
+.oh-item.weekend{background:#fff8f0;border-color:#f0d8b0}
+.oh-item-info{flex:1;color:#444}
+.oh-item button{background:none;border:none;cursor:pointer;color:#bbb;font-size:12px;padding:1px 4px;border-radius:3px}
+.oh-item button:hover{color:#c04040;background:#fee}
+.oh-save{height:28px;padding:0 12px;background:#111;border:1px solid #111;border-radius:5px;cursor:pointer;font-size:12px;color:#fff}
+.oh-save:hover{background:#333}
+.oh-badge{display:inline-block;font-size:9px;background:#faeeda;color:#7a4a00;border-radius:3px;padding:1px 5px;font-weight:500;margin-left:4px;vertical-align:middle}
 @media print{
   body{background:#fff}.shell{padding:.5rem}
   .dnav,.ibtn,.vtabs,.addsec,.cosec .coi button,.jacts,.bleg,.banner,.wtabs{display:none!important}
@@ -162,7 +182,45 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f3f0;color:#11
   <button class="ibtn" onclick="backup()">&#128190; Backup</button>
   <button class="ibtn" onclick="document.getElementById('ri').click()">&#8657; Restore</button>
   <input type="file" id="ri" accept=".json" style="display:none" onchange="restore(event)"/>
+  <button class="ibtn" onclick="toggleOH()" id="oh-toggle-btn">&#9881; Hours</button>
   <button class="ibtn" onclick="clearDay()" style="color:#a02020;border-color:#e0a0a0">&#10005; Clear day</button>
+</div>
+
+<!-- Opening Hours Override Panel -->
+<div class="oh-panel" id="oh-panel">
+  <h3>
+    <span>&#9881; Opening hours override — <span id="oh-date-display"></span></span>
+    <button class="oh-save" onclick="saveOH()">&#10003; Save for this date</button>
+  </h3>
+  <div class="oh-grid">
+    <div class="oh-field"><label>Open (HH:MM)</label><input type="time" id="oh-start" value="08:00" step="1800"/></div>
+    <div class="oh-field"><label>Close (HH:MM)</label><input type="time" id="oh-end" value="16:30" step="1800"/></div>
+    <div class="oh-field"><label>Weekend / holiday opening?</label>
+      <select id="oh-weekend"><option value="0">No</option><option value="1">Yes — open this day</option></select>
+    </div>
+    <div class="oh-field"><label>Break presets</label>
+      <select id="oh-brk-preset" onchange="applyBrkPreset()">
+        <option value="std">Standard (10:00, 13:00, 15:00)</option>
+        <option value="none">No breaks</option>
+        <option value="custom">Custom (edit below)</option>
+      </select>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:.6rem" id="oh-brk-fields">
+    <div class="oh-field"><label>Break 1 start–end</label>
+      <div style="display:flex;gap:4px"><input type="time" id="oh-b1s" value="10:00" step="1800" style="flex:1"/><span style="align-self:center;font-size:11px;color:#888">–</span><input type="time" id="oh-b1e" value="10:20" step="1800" style="flex:1"/></div>
+    </div>
+    <div class="oh-field"><label>Break 2 start–end</label>
+      <div style="display:flex;gap:4px"><input type="time" id="oh-b2s" value="13:00" step="1800" style="flex:1"/><span style="align-self:center;font-size:11px;color:#888">–</span><input type="time" id="oh-b2e" value="13:30" step="1800" style="flex:1"/></div>
+    </div>
+    <div class="oh-field"><label>Break 3 start–end</label>
+      <div style="display:flex;gap:4px"><input type="time" id="oh-b3s" value="15:00" step="1800" style="flex:1"/><span style="align-self:center;font-size:11px;color:#888">–</span><input type="time" id="oh-b3e" value="15:10" step="1800" style="flex:1"/></div>
+    </div>
+  </div>
+  <div class="oh-overrides">
+    <h4>Saved overrides</h4>
+    <div class="oh-list" id="oh-list"><div style="font-size:11px;color:#bbb">No overrides saved</div></div>
+  </div>
 </div>
 
 <div class="vtabs">
@@ -225,16 +283,17 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f3f0;color:#11
       <button class="tabb" onclick="swTab('labour')">Labour</button>
     </div>
     <div class="fpanel active" id="fp-cnc">
-      <div class="fgrid" style="grid-template-columns:1.5fr .6fr .5fr .5fr .5fr .5fr auto">
+      <div class="fgrid" style="grid-template-columns:1.5fr .6fr .5fr .5fr .5fr .5fr .7fr auto">
         <div class="fg"><label>Job name / ID</label><input type="text" id="f-name" placeholder="e.g. Cabinet sides" maxlength="50"/></div>
         <div class="fg"><label>Machine</label><select id="f-mach"><option value="0">Felder ★</option><option value="1">AXYZ</option></select></div>
         <div class="fg"><label>Sheets</label><input type="number" id="f-sh" min="1" max="9999" placeholder="8"/></div>
         <div class="fg"><label>Mins/sheet</label><input type="number" id="f-st" min="1" max="9999" placeholder="12"/></div>
         <div class="fg"><label>Load/sheet</label><input type="number" id="f-ld" min="1" max="999" placeholder="5"/></div>
         <div class="fg"><label>Unload/sheet</label><input type="number" id="f-ul" min="1" max="999" placeholder="5"/></div>
+        <div class="fg"><label>Start time</label><select id="f-start"><option value="auto">Next slot</option></select></div>
         <button class="badd" onclick="addCNC()">+ Add</button>
       </div>
-      <div class="fnote">★ Felder default. Jobs &gt;3hrs get 1hr gap before next job on same machine. Auto-splits to next day if needed.</div>
+      <div class="fnote">★ Felder default. Jobs &gt;3hrs get 1hr gap before next job. Start time: "Next slot" = auto. Inserting at a specific time pushes later jobs back.</div>
     </div>
     <div class="fpanel" id="fp-eb">
       <div class="fgrid" style="grid-template-columns:1.5fr .9fr .9fr auto">
@@ -299,6 +358,8 @@ const COLS=['#378ADD','#1D9E75','#BA7517','#D4537E','#7F77DD','#639922','#D85A30
 const EBC='#C07820';
 const LAC='#7050B0';
 const LSK='cnc_planner_v4';
+const OVK='cnc_planner_ov_v1';
+let OV={};  // OV[dateKey] = {sched:{s,e}, brk:[{s,e}...]}
 const GAP_MINS=60;
 const LONG_JOB_MINS=180;
 
@@ -310,15 +371,36 @@ let curView='daily';
 let curWTab='felder';
 let monthRef=new Date();
 
-function save(){try{localStorage.setItem(LSK,JSON.stringify({ST,cc}))}catch(e){}}
-function load(){try{const r=localStorage.getItem(LSK);if(!r)return;const p=JSON.parse(r);if(p.ST)ST=p.ST;if(p.cc)cc=p.cc;}catch(e){}}
+function save(){try{localStorage.setItem(LSK,JSON.stringify({ST,cc}));localStorage.setItem(OVK,JSON.stringify(OV));}catch(e){}}
+function load(){
+  try{const r=localStorage.getItem(LSK);if(!r)return;const p=JSON.parse(r);if(p.ST)ST=p.ST;if(p.cc)cc=p.cc;}catch(e){}
+  try{const r=localStorage.getItem(OVK);if(r){const p=JSON.parse(r);if(p)OV=p;}}catch(e){}
+}
 function dk(d){return d.toISOString().slice(0,10)}
-function isWE(d){return d.getDay()===0||d.getDay()===6}
-function gs(d){return SCH[d.getDay()]||null}
+function isWE(d){
+  const k=dk(d);
+  if(OV[k]&&OV[k].weekend)return false;  // override opens this day
+  return d.getDay()===0||d.getDay()===6;
+}
+function gs(d){
+  const k=dk(d);
+  if(OV[k])return OV[k].sched;
+  if(isWE(d))return null;
+  return SCH[d.getDay()]||null;
+}
 function ft(m){return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')}
 function fd(m){const h=Math.floor(m/60),mn=m%60;return h>0?(mn>0?h+'h '+mn+'m':h+'h'):mn+'m'}
 function eh(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-function inBrk(m){for(const b of BRK)if(m>=b.s&&m<b.e)return b;return null}
+function getBrk(){return _curBrk||BRK}
+function inBrk(m){for(const b of getBrk())if(m>=b.s&&m<b.e)return b;return null}
+let _curBrk=null;
+function withBrk(k,fn){
+  const prev=_curBrk;
+  _curBrk=OV[k]?OV[k].brk:null;
+  const r=fn();
+  _curBrk=prev;
+  return r;
+}
 function nwd(d){let n=new Date(d);do{n.setDate(n.getDate()+1)}while(isWE(n)||!SCH[n.getDay()]);return n;}
 function initDay(k){if(!ST[k])ST[k]={cnc:[[],[]],eb:[],labour:[]};}
 
@@ -398,6 +480,8 @@ function placeAll(sched,k){
       // Apply 1hr gap after long jobs
       let fromCursor=macCursor;
       if(prevJobLong&&macCursor+GAP_MINS<=sched.e)fromCursor=macCursor+GAP_MINS;
+      // Honour pinned start time (pushes cursor forward if needed)
+      if(j.pinnedStart!==null&&j.pinnedStart!==undefined&&j.pinnedStart>fromCursor)fromCursor=j.pinnedStart;
       const res=schedSheets(j.sheets,j.sheetTime,j.load,j.unload,fromCursor,sched,opBusy);
       const done=res.done;const remaining=res.remaining;
       if(done.length===0){
@@ -487,14 +571,32 @@ function addCNC(){
   const st=parseInt(document.getElementById('f-st').value)||0;
   const ld=parseInt(document.getElementById('f-ld').value)||0;
   const ul=parseInt(document.getElementById('f-ul').value)||0;
+  const startVal=document.getElementById('f-start').value;
   const err=document.getElementById('errmsg');
   if(isWE(cur)){err.textContent='No shift on weekends.';return}
   if(!sheets||!st||!ld||!ul){err.textContent='Fill in all fields.';return}
   err.textContent='';
   const k=dk(cur);initDay(k);
-  ST[k].cnc[mIdx].push({id:Date.now(),name,sheets,sheetTime:st,load:ld,unload:ul,color:COLS[cc%COLS.length],overflow:false,carryover:false,jumbo:mIdx===0,splitFrom:null,editing:false,sheets_sched:null});
+  const pinnedStart=startVal==='auto'?null:parseInt(startVal);
+  const newJob={id:Date.now(),name,sheets,sheetTime:st,load:ld,unload:ul,color:COLS[cc%COLS.length],overflow:false,carryover:false,jumbo:mIdx===0,splitFrom:null,editing:false,sheets_sched:null,pinnedStart};
   cc++;
+  if(pinnedStart!==null){
+    const list=ST[k].cnc[mIdx];
+    let insertIdx=list.length;
+    let accTime=gs(cur).s;
+    for(let i=0;i<list.length;i++){
+      const j=list[i];
+      if(j.carryover)continue;
+      const jEst=j.pinnedStart!==null&&j.pinnedStart!==undefined?j.pinnedStart:accTime;
+      if(jEst>=pinnedStart){insertIdx=i;break;}
+      accTime+=j.sheets*(j.load+j.sheetTime+j.unload);
+    }
+    list.splice(insertIdx,0,newJob);
+  } else {
+    ST[k].cnc[mIdx].push(newJob);
+  }
   ['f-name','f-sh','f-st','f-ld','f-ul'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-start').value='auto';
   save();render();
 }
 
@@ -752,7 +854,7 @@ function setupDrag(row,type,mIdx,jIdx,listEl,tgtMIdx){
 function getDayStats(dateObj){
   const sched=gs(dateObj);const k=dk(dateObj);
   if(!sched||isWE(dateObj))return null;
-  initDay(k);placeAll(sched,k);save();
+  initDay(k);withBrk(k,()=>placeAll(sched,k));save();
   const d=ST[k];const dm=sched.e-sched.s;
   let mac0=0,mac1=0,opMins=0;
   for(const j of d.cnc[0])if(j.sheets_sched&&!j.carryover)for(const sh of j.sheets_sched)mac0+=sh.re-sh.rs;
@@ -768,7 +870,9 @@ function getDayStats(dateObj){
 // ── Render daily ──────────────────────────────────────────────────────────
 function renderDaily(){
   const sched=gs(cur);const k=dk(cur);
-  document.getElementById('dlabel').textContent=`${DAYS[cur.getDay()]}, ${cur.getDate()} ${MONTHS_S[cur.getMonth()]} ${cur.getFullYear()}`;
+  const _k=dk(cur);
+  const _ovBadge=OV[_k]?'<span class="oh-badge">custom hours</span>':'';
+  document.getElementById('dlabel').innerHTML=`${DAYS[cur.getDay()]}, ${cur.getDate()} ${MONTHS_S[cur.getMonth()]} ${cur.getFullYear()}${_ovBadge}`;
   initDay(k);
   if(!sched||isWE(cur)){
     ['s-shift','s-u0','s-u1','s-uop','s-jobs'].forEach(id=>document.getElementById(id).textContent='—');
@@ -780,7 +884,7 @@ function renderDaily(){
     document.getElementById('ov-banner').classList.remove('show');
     rCarryover();return;
   }
-  placeAll(sched,k);save();
+  withBrk(k,()=>placeAll(sched,k));save();
   const dm=sched.e-sched.s;
   document.getElementById('s-shift').textContent=fd(dm);
   const mac0=rMachineTL(document.getElementById('tl-0'),document.getElementById('bg-0'),document.getElementById('tk-0'),document.getElementById('tls-0'),0,sched,k);
@@ -799,6 +903,7 @@ function renderDaily(){
   const tot=d.cnc[0].filter(j=>!j.carryover).length+d.cnc[1].filter(j=>!j.carryover).length+(d.eb||[]).filter(j=>!j.carryover).length+(d.labour||[]).filter(j=>!j.carryover).length;
   document.getElementById('s-jobs').textContent=tot;
   document.getElementById('ov-banner').classList.remove('show');
+  populateStartDropdown();
   rCarryover();
 }
 
@@ -858,7 +963,7 @@ function renderWeekly(){
         wday.innerHTML=`<div class="wday-hdr"><span class="wday-name">${dayLabel}</span><span class="wday-util" style="color:#bbb">Weekend</span></div>`;
         container.appendChild(wday);continue;
       }
-      initDay(k);placeAll(sched,k);save();
+      initDay(k);withBrk(k,()=>placeAll(sched,k));save();
       const d=ST[k];const dm=sched.e-sched.s;
       let mac0=0,mac1=0,opMins=0;
       for(const j of d.cnc[0])if(j.sheets_sched&&!j.carryover)for(const sh of j.sheets_sched)mac0+=sh.re-sh.rs;
@@ -961,11 +1066,128 @@ function swWTab(t){
   document.querySelectorAll('.wpanel').forEach((p,i)=>{p.classList.toggle('active',['felder','axyz','operator'][i]===t);});
 }
 
+function populateStartDropdown(){
+  const sel=document.getElementById('f-start');
+  if(!sel)return;
+  const sched=gs(cur);
+  if(!sched||isWE(cur)){sel.innerHTML='<option value="auto">Next slot</option>';return;}
+  const isToday=dk(cur)===dk(new Date());
+  let earliest=sched.s;
+  if(isToday){
+    const now=new Date();
+    const nowMins=now.getHours()*60+now.getMinutes();
+    earliest=Math.ceil(nowMins/30)*30;
+    if(earliest<sched.s)earliest=sched.s;
+  }
+  const opts=['<option value="auto">Next slot</option>'];
+  for(let t=sched.s;t<sched.e;t+=30){
+    const inB=inBrk(t);if(inB)continue;
+    if(t<earliest&&isToday)continue;
+    opts.push(`<option value="${t}"${t===earliest&&isToday?' selected':''}>${ft(t)}</option>`);
+  }
+  sel.innerHTML=opts.join('');
+}
+
+// ── Opening hours override functions ─────────────────────────────────────
+function timeTo(str){
+  if(!str)return null;
+  const[h,m]=str.split(':').map(Number);
+  return h*60+m;
+}
+function minsToTime(m){
+  return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+}
+function toggleOH(){
+  const panel=document.getElementById('oh-panel');
+  panel.classList.toggle('open');
+  if(panel.classList.contains('open')){
+    loadOHForm();
+    renderOHList();
+  }
+}
+function loadOHForm(){
+  const k=dk(cur);
+  const dow=cur.getDay();
+  document.getElementById('oh-date-display').textContent=
+    DAYS[dow]+', '+cur.getDate()+' '+MONTHS_S[cur.getMonth()]+' '+cur.getFullYear();
+  // Populate form with existing override or defaults
+  const ov=OV[k];
+  const defSch=SCH[dow]||{s:480,e:990};
+  const s=ov?ov.sched.s:defSch.s;
+  const e=ov?ov.sched.e:defSch.e;
+  document.getElementById('oh-start').value=minsToTime(s);
+  document.getElementById('oh-end').value=minsToTime(e);
+  document.getElementById('oh-weekend').value=(ov&&ov.weekend)?'1':'0';
+  const brk=ov?ov.brk:BRK;
+  if(brk.length>=1){document.getElementById('oh-b1s').value=minsToTime(brk[0].s);document.getElementById('oh-b1e').value=minsToTime(brk[0].e);}
+  if(brk.length>=2){document.getElementById('oh-b2s').value=minsToTime(brk[1].s);document.getElementById('oh-b2e').value=minsToTime(brk[1].e);}
+  if(brk.length>=3){document.getElementById('oh-b3s').value=minsToTime(brk[2].s);document.getElementById('oh-b3e').value=minsToTime(brk[2].e);}
+}
+function applyBrkPreset(){
+  const v=document.getElementById('oh-brk-preset').value;
+  const fields=document.getElementById('oh-brk-fields');
+  if(v==='none'){
+    ['oh-b1s','oh-b1e','oh-b2s','oh-b2e','oh-b3s','oh-b3e'].forEach(id=>{document.getElementById(id).value='';});
+  } else if(v==='std'){
+    document.getElementById('oh-b1s').value='10:00';document.getElementById('oh-b1e').value='10:20';
+    document.getElementById('oh-b2s').value='13:00';document.getElementById('oh-b2e').value='13:30';
+    document.getElementById('oh-b3s').value='15:00';document.getElementById('oh-b3e').value='15:10';
+  }
+}
+function saveOH(){
+  const k=dk(cur);
+  const s=timeTo(document.getElementById('oh-start').value);
+  const e=timeTo(document.getElementById('oh-end').value);
+  const weekend=document.getElementById('oh-weekend').value==='1';
+  if(s===null||e===null||e<=s){alert('Invalid open/close times.');return;}
+  const brk=[];
+  const pairs=[[document.getElementById('oh-b1s').value,document.getElementById('oh-b1e').value],
+    [document.getElementById('oh-b2s').value,document.getElementById('oh-b2e').value],
+    [document.getElementById('oh-b3s').value,document.getElementById('oh-b3e').value]];
+  for(const[bs,be]of pairs){
+    const bsm=timeTo(bs),bem=timeTo(be);
+    if(bsm!==null&&bem!==null&&bem>bsm&&bsm>=s&&bem<=e)brk.push({s:bsm,e:bem});
+  }
+  OV[k]={sched:{s,e},brk,weekend};
+  save();
+  renderOHList();
+  render();
+}
+function removeOH(k){
+  delete OV[k];
+  save();
+  renderOHList();
+  render();
+}
+function renderOHList(){
+  const lst=document.getElementById('oh-list');
+  const keys=Object.keys(OV).sort();
+  if(!keys.length){lst.innerHTML='<div style="font-size:11px;color:#bbb">No overrides saved</div>';return;}
+  lst.innerHTML='';
+  for(const k of keys){
+    const ov=OV[k];
+    const d=new Date(k+'T12:00:00');
+    const isWEnd=d.getDay()===0||d.getDay()===6;
+    const item=document.createElement('div');
+    item.className='oh-item'+(isWEnd||ov.weekend?' weekend':'');
+    const brkStr=ov.brk.length?ov.brk.map(b=>minsToTime(b.s)+'–'+minsToTime(b.e)).join(', '):'No breaks';
+    item.innerHTML=`<div class="oh-item-info">
+      <strong>${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS_S[d.getMonth()]} ${d.getFullYear()}</strong>
+      ${isWEnd||ov.weekend?'<span class="oh-badge">weekend open</span>':''}
+      &nbsp;·&nbsp; ${minsToTime(ov.sched.s)}–${minsToTime(ov.sched.e)}
+      &nbsp;·&nbsp; Breaks: ${brkStr}
+    </div>
+    <button onclick="removeOH('${k}')" title="Remove override">&#10005;</button>`;
+    lst.appendChild(item);
+  }
+}
+
 function swTab(t){
   document.querySelectorAll('.tabb').forEach((b,i)=>{b.classList.toggle('active',['cnc','eb','labour'][i]===t);});
   document.querySelectorAll('.fpanel').forEach(p=>p.classList.remove('active'));
   document.getElementById('fp-'+t).classList.add('active');
   document.getElementById('errmsg').textContent='';
+  if(t==='cnc')populateStartDropdown();
 }
 
 function chDay(d){const n=new Date(cur);n.setDate(n.getDate()+d);cur=n;render();}
@@ -995,7 +1217,7 @@ function expCSV(){
 }
 
 function backup(){
-  const blob=new Blob([JSON.stringify({version:4,exported:new Date().toISOString(),ST,cc},null,2)],{type:'application/json'});
+  const blob=new Blob([JSON.stringify({version:4,exported:new Date().toISOString(),ST,cc,OV},null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download=`CNC_Backup_${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(a.href);
 }
@@ -1008,14 +1230,14 @@ function restore(event){
       const p=JSON.parse(e.target.result);
       if(!p.ST){alert('Invalid backup.');return}
       if(!confirm(`Restore from ${p.exported?new Date(p.exported).toLocaleString():'unknown'}?`))return;
-      ST=p.ST;cc=p.cc||0;save();render();alert('Restored.');
+      ST=p.ST;cc=p.cc||0;if(p.OV)OV=p.OV;save();render();alert('Restored.');
     }catch(err){alert('Could not read backup.');}
   };
   reader.readAsText(file);event.target.value='';
 }
 
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
-load();render();
+load();renderOHList();render();
 </script>
 </body>
 </html>
