@@ -281,6 +281,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f3f0;color:#11
       <button class="tabb active" onclick="swTab('cnc')">CNC job</button>
       <button class="tabb" onclick="swTab('eb')">Edgebanding</button>
       <button class="tabb" onclick="swTab('labour')">Labour</button>
+      <button class="tabb" onclick="swTab('ops')">Extra operators</button>
     </div>
     <div class="fpanel active" id="fp-cnc">
       <div class="fgrid" style="grid-template-columns:1.5fr .6fr .5fr .5fr .5fr .5fr .7fr auto">
@@ -296,22 +297,41 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f3f0;color:#11
       <div class="fnote">★ Felder default. Jobs &gt;3hrs get 1hr gap before next job. Start time: "Next slot" = auto. Inserting at a specific time pushes later jobs back.</div>
     </div>
     <div class="fpanel" id="fp-eb">
-      <div class="fgrid" style="grid-template-columns:1.5fr .9fr .9fr auto">
+      <div class="fgrid" style="grid-template-columns:1.4fr .75fr .6fr .7fr .7fr auto">
         <div class="fg"><label>Job name (must match CNC job)</label><input type="text" id="f-eb-name" placeholder="e.g. Cabinet sides" maxlength="50"/></div>
         <div class="fg"><label>Linked machine</label><select id="f-eb-mach"><option value="0">Felder</option><option value="1">AXYZ</option></select></div>
         <div class="fg"><label>Duration (mins)</label><input type="number" id="f-eb-dur" min="1" max="999" placeholder="30"/></div>
+        <div class="fg"><label>Start time</label><select id="f-eb-start"><option value="auto">Auto</option></select></div>
+        <div class="fg"><label>Operator</label><select id="f-eb-op"><option value="main">Main operator</option></select></div>
         <button class="badd" onclick="addEB()">+ Add</button>
       </div>
-      <div class="fnote">Starts after CNC job finishes. Pauses for load/unload. Runs concurrently with other CNC machine runs.</div>
+      <div class="fnote">Starts after CNC job finishes (or at chosen time). Can assign to an extra operator if added below.</div>
     </div>
     <div class="fpanel" id="fp-labour">
-      <div class="fgrid" style="grid-template-columns:1.5fr .9fr .9fr auto">
+      <div class="fgrid" style="grid-template-columns:1.4fr .75fr .6fr .7fr .7fr auto">
         <div class="fg"><label>Task description</label><input type="text" id="f-lab-name" placeholder="e.g. Assembly" maxlength="50"/></div>
         <div class="fg"><label>Linked job (optional)</label><input type="text" id="f-lab-link" placeholder="Leave blank if standalone"/></div>
         <div class="fg"><label>Duration (mins)</label><input type="number" id="f-lab-dur" min="1" max="999" placeholder="45"/></div>
+        <div class="fg"><label>Start time</label><select id="f-lab-start"><option value="auto">Auto</option></select></div>
+        <div class="fg"><label>Operator</label><select id="f-lab-op"><option value="main">Main operator</option></select></div>
         <button class="badd" onclick="addLabour()">+ Add</button>
       </div>
-      <div class="fnote">Fills operator gaps. If linked, starts after that CNC job finishes.</div>
+      <div class="fnote">Fills operator gaps. If linked, starts after that CNC job finishes. Can assign to an extra operator.</div>
+    </div>
+    <div class="fpanel" id="fp-ops">
+      <div style="margin-bottom:.6rem">
+        <div class="fgrid" style="grid-template-columns:1.4fr .8fr .8fr auto;margin-bottom:.5rem">
+          <div class="fg"><label>Operator name</label><input type="text" id="f-op-name" placeholder="e.g. John" maxlength="30"/></div>
+          <div class="fg"><label>Available from</label><select id="f-op-start"><option value="auto">Shift start</option></select></div>
+          <div class="fg"><label>Available until</label><select id="f-op-end"><option value="auto">Shift end</option></select></div>
+          <button class="badd" onclick="addOperator()">+ Add</button>
+        </div>
+        <div class="fnote">Extra operators can be assigned edgebanding and labour tasks. They do not load/unload CNC machines.</div>
+      </div>
+      <div id="op-list-wrap">
+        <div style="font-size:11px;font-weight:600;color:#555;margin-bottom:.35rem">Operators for this day</div>
+        <div id="op-list" style="display:flex;flex-direction:column;gap:4px"></div>
+      </div>
     </div>
     <div class="err" id="errmsg"></div>
   </div>
@@ -402,7 +422,7 @@ function withBrk(k,fn){
   return r;
 }
 function nwd(d){let n=new Date(d);do{n.setDate(n.getDate()+1)}while(isWE(n)||!SCH[n.getDay()]);return n;}
-function initDay(k){if(!ST[k])ST[k]={cnc:[[],[]],eb:[],labour:[]};}
+function initDay(k){if(!ST[k])ST[k]={cnc:[[],[]],eb:[],labour:[],xops:[]};}
 
 // ── Operator free-slot finder ─────────────────────────────────────────────
 function opNextFree(cursor,need,sched,opBusy){
@@ -414,6 +434,16 @@ function opNextFree(cursor,need,sched,opBusy){
     return c;
   }
   return null;
+}
+
+function buildXOpBusy(k,opName){
+  const d=ST[k];if(!d)return[];
+  const blocks=[];
+  for(const j of [...(d.eb||[]),...(d.labour||[])]){
+    if(j.assignedOp!==opName)continue;
+    if(j.opBlocks)for(const b of j.opBlocks)blocks.push({s:b.s,e:b.e});
+  }
+  return blocks.sort((a,b)=>a.s-b.s);
 }
 
 function buildOpBusy(k){
@@ -449,13 +479,14 @@ function schedSheets(sheets,sheetTime,loadMins,unloadMins,startFrom,sched,opBusy
   return{done:result,remaining:0};
 }
 
-function fillOpSegs(need,earliest,sched,opBusy){
-  let remaining=need,cursor=Math.max(earliest,sched.s);
+function fillOpSegs(need,earliest,sched,opBusy,pinnedStart){
+  let remaining=need;
+  let cursor=pinnedStart!==null&&pinnedStart!==undefined?Math.max(pinnedStart,sched.s):Math.max(earliest,sched.s);
   const segs=[];let safety=0;
   while(remaining>0&&cursor<sched.e&&safety++<5000){
     const br=inBrk(cursor);if(br){cursor=br.e;continue}
     const ob=opBusy.find(b=>b.e>cursor&&b.s<=cursor);if(ob){cursor=ob.e;continue}
-    const nextInt=[...BRK.map(b=>b.s),...opBusy.map(b=>b.s)].filter(t=>t>cursor).sort((a,b)=>a-b)[0];
+    const nextInt=[...getBrk().map(b=>b.s),...opBusy.map(b=>b.s)].filter(t=>t>cursor).sort((a,b)=>a-b)[0];
     const avail=Math.min(sched.e,nextInt||sched.e)-cursor;
     const take=Math.min(remaining,avail);
     if(take>0){segs.push({s:cursor,e:cursor+take});remaining-=take;cursor+=take;}
@@ -509,11 +540,14 @@ function placeAll(sched,k){
     const linked=d.cnc[j.linkedMachine].find(cj=>cj.name===j.linkedName&&!cj.overflow&&cj.sheets_sched&&!cj.carryover);
     if(!linked){j.overflow=true;continue;}
     const earliest=linked.jobEnd;
-    const opBusy=buildOpBusy(k);
-    const segs=fillOpSegs(j.duration,earliest,sched,opBusy);
+    const isExtra=j.assignedOp&&j.assignedOp!=='main';
+    const xop=isExtra?(d.xops||[]).find(o=>o.name===j.assignedOp):null;
+    const xopSched=xop?{s:xop.start,e:xop.end}:sched;
+    const opBusy=isExtra?buildXOpBusy(k,j.assignedOp):buildOpBusy(k);
+    const segs=fillOpSegs(j.duration,earliest,xopSched,opBusy,j.pinnedStart);
     if(!segs){
-      // carry EB to next day
-      autoCarryEB(k,j);j.carryover=true;j.overflow=false;
+      if(isExtra){j.overflow=true;}
+      else{autoCarryEB(k,j);j.carryover=true;j.overflow=false;}
     } else {j.opBlocks=segs;j.schedStart=segs[0].s;j.overflow=false;}
   }
 
@@ -529,10 +563,14 @@ function placeAll(sched,k){
       }
       if(!found){j.overflow=true;continue;}
     }
-    const opBusy=buildOpBusy(k);
-    const segs=fillOpSegs(j.duration,earliest,sched,opBusy);
+    const isExtra=j.assignedOp&&j.assignedOp!=='main';
+    const xop=isExtra?(d.xops||[]).find(o=>o.name===j.assignedOp):null;
+    const xopSched=xop?{s:xop.start,e:xop.end}:sched;
+    const opBusy=isExtra?buildXOpBusy(k,j.assignedOp):buildOpBusy(k);
+    const segs=fillOpSegs(j.duration,earliest,xopSched,opBusy,j.pinnedStart);
     if(!segs){
-      autoCarryLabour(k,j);j.carryover=true;j.overflow=false;
+      if(isExtra){j.overflow=true;}
+      else{autoCarryLabour(k,j);j.carryover=true;j.overflow=false;}
     } else {j.opBlocks=segs;j.schedStart=segs[0].s;j.overflow=false;}
   }
 }
@@ -604,6 +642,8 @@ function addEB(){
   const name=document.getElementById('f-eb-name').value.trim();
   const mIdx=parseInt(document.getElementById('f-eb-mach').value);
   const dur=parseInt(document.getElementById('f-eb-dur').value)||0;
+  const startVal=document.getElementById('f-eb-start').value;
+  const opVal=document.getElementById('f-eb-op').value;
   const err=document.getElementById('errmsg');
   if(isWE(cur)){err.textContent='No shift on weekends.';return}
   if(!name||!dur){err.textContent='Fill in all fields.';return}
@@ -611,8 +651,10 @@ function addEB(){
   const linked=ST[k].cnc[mIdx].find(j=>j.name===name);
   if(!linked){err.textContent=`No CNC job "${name}" on ${MN[mIdx]}.`;return}
   err.textContent='';
-  ST[k].eb.push({id:Date.now(),name,linkedName:name,linkedMachine:mIdx,duration:dur,color:EBC,overflow:false,carryover:false,editing:false,opBlocks:null,schedStart:null});
+  const pinnedStart=startVal==='auto'?null:parseInt(startVal);
+  ST[k].eb.push({id:Date.now(),name,linkedName:name,linkedMachine:mIdx,duration:dur,color:EBC,overflow:false,carryover:false,editing:false,opBlocks:null,schedStart:null,pinnedStart,assignedOp:opVal});
   ['f-eb-name','f-eb-dur'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-eb-start').value='auto';
   save();render();
 }
 
@@ -620,14 +662,84 @@ function addLabour(){
   const name=document.getElementById('f-lab-name').value.trim()||'Labour';
   const link=document.getElementById('f-lab-link').value.trim();
   const dur=parseInt(document.getElementById('f-lab-dur').value)||0;
+  const startVal=document.getElementById('f-lab-start').value;
+  const opVal=document.getElementById('f-lab-op').value;
   const err=document.getElementById('errmsg');
   if(isWE(cur)){err.textContent='No shift on weekends.';return}
   if(!dur){err.textContent='Enter duration.';return}
   err.textContent='';
   const k=dk(cur);initDay(k);
-  ST[k].labour.push({id:Date.now(),name,linkedName:link||null,duration:dur,color:LAC,overflow:false,carryover:false,editing:false,opBlocks:null,schedStart:null});
+  const pinnedStart=startVal==='auto'?null:parseInt(startVal);
+  ST[k].labour.push({id:Date.now(),name,linkedName:link||null,duration:dur,color:LAC,overflow:false,carryover:false,editing:false,opBlocks:null,schedStart:null,pinnedStart,assignedOp:opVal});
   ['f-lab-name','f-lab-link','f-lab-dur'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-lab-start').value='auto';
   save();render();
+}
+
+function addOperator(){
+  const name=document.getElementById('f-op-name').value.trim();
+  const startVal=document.getElementById('f-op-start').value;
+  const endVal=document.getElementById('f-op-end').value;
+  const err=document.getElementById('errmsg');
+  if(!name){err.textContent='Enter operator name.';return}
+  err.textContent='';
+  const k=dk(cur);initDay(k);
+  const sched=gs(cur);
+  const s=startVal==='auto'?(sched?sched.s:480):parseInt(startVal);
+  const e=endVal==='auto'?(sched?sched.e:990):parseInt(endVal);
+  if(e<=s){err.textContent='End must be after start.';return}
+  ST[k].xops=ST[k].xops||[];
+  ST[k].xops.push({id:Date.now(),name,start:s,end:e,color:COLS[(cc+ST[k].xops.length)%COLS.length]});
+  document.getElementById('f-op-name').value='';
+  save();renderOpList();updateOpDropdowns();render();
+}
+
+function removeOperator(idx){
+  const k=dk(cur);
+  if(!ST[k]||!ST[k].xops)return;
+  const removedName=ST[k].xops[idx].name;
+  ST[k].xops.splice(idx,1);
+  // Reassign any EB/labour assigned to this operator back to main
+  for(const j of [...(ST[k].eb||[]),...(ST[k].labour||[])]){
+    if(j.assignedOp===removedName)j.assignedOp='main';
+  }
+  save();renderOpList();updateOpDropdowns();render();
+}
+
+function renderOpList(){
+  const wrap=document.getElementById('op-list');if(!wrap)return;
+  const k=dk(cur);const xops=(ST[k]&&ST[k].xops)||[];
+  if(!xops.length){wrap.innerHTML='<div style="font-size:11px;color:#bbb">No extra operators for this day</div>';return;}
+  wrap.innerHTML='';
+  xops.forEach((op,i)=>{
+    const div=document.createElement('div');div.className='coi';
+    div.innerHTML=`<div class="coi-dot" style="background:${op.color}"></div>
+      <div class="coi-info"><strong>${eh(op.name)}</strong> &nbsp;·&nbsp; ${ft(op.start)}–${ft(op.end)}</div>
+      <button onclick="removeOperator(${i})">&#10005;</button>`;
+    wrap.appendChild(div);
+  });
+}
+
+function updateOpDropdowns(){
+  const k=dk(cur);const xops=(ST[k]&&ST[k].xops)||[];
+  const base='<option value="main">Main operator</option>';
+  const extras=xops.map(op=>`<option value="${eh(op.name)}">${eh(op.name)}</option>`).join('');
+  ['f-eb-op','f-lab-op'].forEach(id=>{
+    const sel=document.getElementById(id);
+    if(sel)sel.innerHTML=base+extras;
+  });
+  // Also populate op-start and op-end dropdowns
+  const sched=gs(cur);
+  if(!sched)return;
+  ['f-op-start','f-op-end'].forEach((id,isEnd)=>{
+    const sel=document.getElementById(id);if(!sel)return;
+    const opts=[`<option value="auto">${isEnd?'Shift end':'Shift start'}</option>`];
+    for(let t=sched.s;t<=sched.e;t+=30){
+      if(inBrk(t))continue;
+      opts.push(`<option value="${t}">${ft(t)}</option>`);
+    }
+    sel.innerHTML=opts.join('');
+  });
 }
 
 function removeJob(type,mIdx,jIdx){
@@ -657,7 +769,11 @@ function svEdit(type,mIdx,jIdx){
     if(ns>0)j.sheets=ns;if(nt>0)j.sheetTime=nt;if(nl>0)j.load=nl;if(nu>0)j.unload=nu;
   } else {
     const nd=parseInt(document.getElementById(`ee-dur-${type}-${jIdx}`).value);
+    const ns2=document.getElementById(`ee-start-${type}-${jIdx}`)?document.getElementById(`ee-start-${type}-${jIdx}`).value:null;
+    const nop=document.getElementById(`ee-op-${type}-${jIdx}`)?document.getElementById(`ee-op-${type}-${jIdx}`).value:null;
     if(nd>0)j.duration=nd;
+    if(ns2!==null)j.pinnedStart=ns2==='auto'?null:parseInt(ns2);
+    if(nop!==null)j.assignedOp=nop;
   }
   j.editing=false;save();render();
 }
@@ -750,6 +866,23 @@ function rOpTL(tl,bgEl,tkEl,tlsEl,sched,k){
     if(!j.opBlocks||j.carryover)continue;
     for(const b of j.opBlocks){addSeg(tl,b.s,b.e-b.s,LAC,.85,'Lab',sched,`Labour: ${j.name} ${ft(b.s)}–${ft(b.e)}`);opMins+=b.e-b.s;}
   }
+  // Extra operator timelines
+  const xops=(d.xops||[]);
+  for(const xop of xops){
+    const xopSched={s:xop.start,e:xop.end};
+    const xtasks=[...(d.eb||[]).filter(j=>j.assignedOp===xop.name&&!j.carryover),
+                  ...(d.labour||[]).filter(j=>j.assignedOp===xop.name&&!j.carryover)];
+    if(!xtasks.length)continue;
+    for(const j of xtasks){
+      if(!j.opBlocks)continue;
+      const col=j.opBlocks?( (d.eb||[]).includes(j)?EBC:LAC ):LAC;
+      for(const b of j.opBlocks){
+        // draw on op timeline with xop colour
+        addSeg(tl,b.s,b.e-b.s,xop.color,.75,xop.name.split(' ')[0],sched,`${xop.name}: ${j.name} ${ft(b.s)}–${ft(b.e)}`);
+        opMins+=b.e-b.s;
+      }
+    }
+  }
   return opMins;
 }
 
@@ -813,11 +946,24 @@ function rOpList(le,k){
       tline=`<div class="jtime">${j.opBlocks.map(b=>ft(b.s)+'–'+ft(b.e)).join(', ')}</div>`;
     const warn=j.overflow?`<div class="jwarn">&#9888; Overflow</div>`:'';
     const coB=j.isCarryover?`<span class="bdg co">carried</span>`:'';
+    const opLabel=j.assignedOp&&j.assignedOp!=='main'?` · <strong>${eh(j.assignedOp)}</strong>`:'';
+    const startLabel=j.pinnedStart?` · from ${ft(j.pinnedStart)}`:'';
     const linkInfo=type==='eb'
-      ?`<div class="jmeta">&#8594; ${eh(j.linkedName)} (${MN[j.linkedMachine]}) · ${fd(j.duration)}</div>`
-      :`<div class="jmeta">${j.linkedName?'&#8594; '+eh(j.linkedName)+' · ':' '}${fd(j.duration)}</div>`;
+      ?`<div class="jmeta">&#8594; ${eh(j.linkedName)} (${MN[j.linkedMachine]}) · ${fd(j.duration)}${startLabel}${opLabel}</div>`
+      :`<div class="jmeta">${j.linkedName?'&#8594; '+eh(j.linkedName)+' · ':' '}${fd(j.duration)}${startLabel}${opLabel}</div>`;
     let erow='';
-    if(j.editing)erow=`<div class="erow"><label>Dur(mins)</label><input id="ee-dur-${type}-${i}" type="number" value="${j.duration}" min="1"/><button class="sb" onclick="svEdit('${type}',0,${i})">&#10003; Save</button></div>`;
+    if(j.editing){
+      const k2=dk(cur);const xops2=(ST[k2]&&ST[k2].xops)||[];
+      const opOpts='<option value="main">Main operator</option>'+xops2.map(op=>`<option value="${eh(op.name)}"${j.assignedOp===op.name?' selected':''}>${eh(op.name)}</option>`).join('');
+      const sched2=gs(cur);
+      let startOpts=`<option value="auto"${!j.pinnedStart?' selected':''}>Auto</option>`;
+      if(sched2)for(let t=sched2.s;t<sched2.e;t+=30){if(inBrk(t))continue;startOpts+=`<option value="${t}"${j.pinnedStart===t?' selected':''}>${ft(t)}</option>`;}
+      erow=`<div class="erow">
+        <label>Dur(mins)</label><input id="ee-dur-${type}-${i}" type="number" value="${j.duration}" min="1" style="width:52px"/>
+        <label>Start</label><select id="ee-start-${type}-${i}" style="height:26px;font-size:11px;border:1px solid #ccc;border-radius:4px">${startOpts}</select>
+        <label>Operator</label><select id="ee-op-${type}-${i}" style="height:26px;font-size:11px;border:1px solid #ccc;border-radius:4px">${opOpts}</select>
+        <button class="sb" onclick="svEdit('${type}',0,${i})">&#10003; Save</button></div>`;
+    }
     row.innerHTML=`<div class="jdot" style="background:${col};margin-top:3px;flex-shrink:0"></div>
       <div class="ji-info">
         <div class="jn">${eh(j.name)} <span class="bdg ${bcls}">${lbl}</span>${coB}</div>
@@ -904,6 +1050,10 @@ function renderDaily(){
   document.getElementById('s-jobs').textContent=tot;
   document.getElementById('ov-banner').classList.remove('show');
   populateStartDropdown();
+  populateOpStartDropdown('f-eb-start');
+  populateOpStartDropdown('f-lab-start');
+  updateOpDropdowns();
+  renderOpList();
   rCarryover();
 }
 
@@ -1182,12 +1332,36 @@ function renderOHList(){
   }
 }
 
+function populateOpStartDropdown(selId){
+  const sel=document.getElementById(selId);if(!sel)return;
+  const sched=gs(cur);
+  if(!sched||isWE(cur)){sel.innerHTML='<option value="auto">Auto (after linked job)</option>';return;}
+  const isToday=dk(cur)===dk(new Date());
+  let earliest=sched.s;
+  if(isToday){
+    const now=new Date();
+    const nowMins=now.getHours()*60+now.getMinutes();
+    earliest=Math.ceil(nowMins/30)*30;
+    if(earliest<sched.s)earliest=sched.s;
+  }
+  const opts=['<option value="auto">Auto (after linked job / next gap)</option>'];
+  for(let t=sched.s;t<sched.e;t+=30){
+    if(inBrk(t))continue;
+    if(t<earliest&&isToday)continue;
+    opts.push(`<option value="${t}">${ft(t)}</option>`);
+  }
+  sel.innerHTML=opts.join('');
+}
+
 function swTab(t){
-  document.querySelectorAll('.tabb').forEach((b,i)=>{b.classList.toggle('active',['cnc','eb','labour'][i]===t);});
+  document.querySelectorAll('.tabb').forEach((b,i)=>{b.classList.toggle('active',['cnc','eb','labour','ops'][i]===t);});
   document.querySelectorAll('.fpanel').forEach(p=>p.classList.remove('active'));
   document.getElementById('fp-'+t).classList.add('active');
   document.getElementById('errmsg').textContent='';
   if(t==='cnc')populateStartDropdown();
+  if(t==='eb'){populateOpStartDropdown('f-eb-start');updateOpDropdowns();}
+  if(t==='labour'){populateOpStartDropdown('f-lab-start');updateOpDropdowns();}
+  if(t==='ops'){renderOpList();updateOpDropdowns();}
 }
 
 function chDay(d){const n=new Date(cur);n.setDate(n.getDate()+d);cur=n;render();}
