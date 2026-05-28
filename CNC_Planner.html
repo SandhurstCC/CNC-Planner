@@ -576,6 +576,7 @@ function placeAll(sched,k){
 }
 
 function autoCarry(k,mIdx,parentJob,remSheets){
+  if(_readOnly)return;
   const nd=nwd(new Date(k));const nk=dk(nd);initDay(nk);
   const existing=ST[nk].cnc[mIdx];
   const already=existing.find(j=>j.splitParentId===parentJob.id);
@@ -590,12 +591,14 @@ function autoCarry(k,mIdx,parentJob,remSheets){
 }
 
 function autoCarryEB(k,j){
+  if(_readOnly)return;
   const nd=nwd(new Date(k));const nk=dk(nd);initDay(nk);
   if(ST[nk].eb.find(e=>e.splitParentId===j.id))return;
   ST[nk].eb.unshift({...j,id:Date.now()+Math.random(),opBlocks:null,schedStart:null,carryover:false,overflow:false,splitParentId:j.id,isCarryover:true});
 }
 
 function autoCarryLabour(k,j){
+  if(_readOnly)return;
   const nd=nwd(new Date(k));const nk=dk(nd);initDay(nk);
   if(ST[nk].labour.find(l=>l.splitParentId===j.id))return;
   ST[nk].labour.unshift({...j,id:Date.now()+Math.random(),opBlocks:null,schedStart:null,carryover:false,overflow:false,splitParentId:j.id,isCarryover:true});
@@ -997,11 +1000,24 @@ function setupDrag(row,type,mIdx,jIdx,listEl,tgtMIdx){
 }
 
 // ── Day stats for weekly/monthly ──────────────────────────────────────────
+// ── Read-only scheduling (weekly/monthly views — never mutates ST) ─────────
+let _readOnly=false;
+function placeAllReadOnly(sched,k){
+  // Deep clone just this day's data, run placeAll on the clone, return clone
+  const orig=ST[k];
+  const clone=JSON.parse(JSON.stringify(orig));
+  ST[k]=clone;
+  _readOnly=true;
+  try{withBrk(k,()=>placeAll(sched,k));}finally{_readOnly=false;ST[k]=orig;}
+  return clone;
+}
+
 function getDayStats(dateObj){
   const sched=gs(dateObj);const k=dk(dateObj);
   if(!sched||isWE(dateObj))return null;
-  initDay(k);withBrk(k,()=>placeAll(sched,k));save();
-  const d=ST[k];const dm=sched.e-sched.s;
+  initDay(k);
+  const d=placeAllReadOnly(sched,k);
+  const dm=sched.e-sched.s;
   let mac0=0,mac1=0,opMins=0;
   for(const j of d.cnc[0])if(j.sheets_sched&&!j.carryover)for(const sh of j.sheets_sched)mac0+=sh.re-sh.rs;
   for(const j of d.cnc[1])if(j.sheets_sched&&!j.carryover)for(const sh of j.sheets_sched)mac1+=sh.re-sh.rs;
@@ -1113,8 +1129,8 @@ function renderWeekly(){
         wday.innerHTML=`<div class="wday-hdr"><span class="wday-name">${dayLabel}</span><span class="wday-util" style="color:#bbb">Weekend</span></div>`;
         container.appendChild(wday);continue;
       }
-      initDay(k);withBrk(k,()=>placeAll(sched,k));save();
-      const d=ST[k];const dm=sched.e-sched.s;
+      initDay(k);
+      const d=placeAllReadOnly(sched,k);const dm=sched.e-sched.s;
       let mac0=0,mac1=0,opMins=0;
       for(const j of d.cnc[0])if(j.sheets_sched&&!j.carryover)for(const sh of j.sheets_sched)mac0+=sh.re-sh.rs;
       for(const j of d.cnc[1])if(j.sheets_sched&&!j.carryover)for(const sh of j.sheets_sched)mac1+=sh.re-sh.rs;
@@ -1145,9 +1161,12 @@ function renderWeekly(){
       const tkEl=document.getElementById(`wtk-${tab}-${k}`);
       const tlsEl=document.getElementById(`wtls-${tab}-${k}`);
       const jlEl=document.getElementById(`wjl-${tab}-${k}`);
+      // Temporarily install the read-only clone so render functions see correct data
+      const _origDay=ST[k];ST[k]=d;
       if(tab==='felder'){rMachineTL(tlEl,bgEl,tkEl,tlsEl,0,sched,k);rMachineList(jlEl,0,k,sched);}
       else if(tab==='axyz'){rMachineTL(tlEl,bgEl,tkEl,tlsEl,1,sched,k);rMachineList(jlEl,1,k,sched);}
       else{rOpTL(tlEl,bgEl,tkEl,tlsEl,sched,k);rOpList(jlEl,k);}
+      ST[k]=_origDay;
     }
   }
 }
@@ -1172,8 +1191,8 @@ function renderMonthly(){
     const isWEnd=isWE(dateObj);
     const dayNum=document.createElement('div');dayNum.className='mday-num'+(isWEnd?' weekend':'');dayNum.textContent=d;cell.appendChild(dayNum);
     if(!isWEnd&&gs(dateObj)){
-      initDay(k);placeAll(gs(dateObj),k);save();
-      const dd=ST[k];const sched=gs(dateObj);const dm=sched.e-sched.s;
+      initDay(k);
+      const dd=placeAllReadOnly(gs(dateObj),k);const sched=gs(dateObj);const dm=sched.e-sched.s;
       let mac0=0,mac1=0,opMins=0;
       for(const j of dd.cnc[0])if(j.sheets_sched&&!j.carryover)for(const sh of j.sheets_sched)mac0+=sh.re-sh.rs;
       for(const j of dd.cnc[1])if(j.sheets_sched&&!j.carryover)for(const sh of j.sheets_sched)mac1+=sh.re-sh.rs;
